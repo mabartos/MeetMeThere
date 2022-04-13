@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
-public interface EventModel {
+public interface EventModel extends HasId, HasAttributes {
 
     UserModel getCreatedBy();
 
@@ -23,6 +23,10 @@ public interface EventModel {
     String getEventTitle();
 
     void setEventTitle(String title);
+
+    String getDescription();
+
+    void setDescription(String description);
 
     LocalDateTime getStartTime();
 
