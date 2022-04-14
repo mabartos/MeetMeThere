@@ -1,6 +1,6 @@
 package org.mabartos.meetmethere.model;
 
-public interface AddressModel {
+public interface AddressModel extends HasId {
 
     String getCountry();
 

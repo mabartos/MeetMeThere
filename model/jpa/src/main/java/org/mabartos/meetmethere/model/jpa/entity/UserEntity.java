@@ -37,9 +37,9 @@ public class UserEntity extends BaseEntity implements HasAttributesEntity<UserAt
 
     private String lastName;
 
-    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "organizer")
+    @OneToMany(mappedBy = "organizer")
     @BatchSize(size = 20)
-    private Set<EventOrganizerEntity> organizedEvents = new HashSet<>();
+    private Set<EventEntity> organizedEvents = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "user")
     @Fetch(FetchMode.SELECT)

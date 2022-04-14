@@ -1,16 +1,26 @@
 package org.mabartos.meetmethere.model.jpa.entity;
 
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.MappedSuperclass;
 import jakarta.persistence.Version;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 import java.util.Objects;
 
 @MappedSuperclass
 @NoArgsConstructor
-public abstract class BaseEntity extends PanacheEntity {
+public abstract class BaseEntity extends PanacheEntityBase {
+
+    @Id
+    @GeneratedValue
+    @Getter
+    @Setter
+    private Long id;
 
     @Version
     private int version;
@@ -20,7 +30,7 @@ public abstract class BaseEntity extends PanacheEntity {
         if (this == o) return true;
         if (!(o instanceof UserEntity)) return false;
         UserEntity that = (UserEntity) o;
-        return Objects.equals(id, that.id);
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override

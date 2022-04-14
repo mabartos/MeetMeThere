@@ -6,7 +6,9 @@ import org.mabartos.meetmethere.model.EventModel;
 import org.mabartos.meetmethere.model.InvitationModel;
 import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.jpa.JpaModel;
+import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.jpa.entity.InvitationEntity;
+import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
 public class JpaInvitationAdapter implements InvitationModel, JpaModel<InvitationEntity> {
@@ -22,12 +24,12 @@ public class JpaInvitationAdapter implements InvitationModel, JpaModel<Invitatio
 
     @Override
     public Long getId() {
-        return getEntity().id;
+        return getEntity().getId();
     }
 
     @Override
     public void setId(Long id) {
-        getEntity().id = id;
+        getEntity().setId(id);
     }
 
     @Override
@@ -37,7 +39,7 @@ public class JpaInvitationAdapter implements InvitationModel, JpaModel<Invitatio
 
     @Override
     public void setEvent(EventModel event) {
-        //TODO
+        getEntity().setEvent(EventEntity.findById(event.getId()));
     }
 
     @Override
@@ -47,7 +49,7 @@ public class JpaInvitationAdapter implements InvitationModel, JpaModel<Invitatio
 
     @Override
     public void setSender(UserModel sender) {
-        //TODO
+        getEntity().setSender(UserEntity.findById(sender.getId()));
     }
 
     @Override
@@ -57,7 +59,7 @@ public class JpaInvitationAdapter implements InvitationModel, JpaModel<Invitatio
 
     @Override
     public void setReceiver(UserModel receiver) {
-        //TODO
+        getEntity().setReceiver(UserEntity.findById(receiver.getId()));
     }
 
     @Override

@@ -19,6 +19,16 @@ public class JpaAddressAdapter implements AddressModel, JpaModel<AddressEntity> 
     }
 
     @Override
+    public Long getId() {
+        return getEntity().getId();
+    }
+
+    @Override
+    public void setId(Long id) {
+        getEntity().setId(id);
+    }
+
+    @Override
     public String getCountry() {
         return getEntity().getCountry();
     }

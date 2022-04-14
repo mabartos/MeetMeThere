@@ -17,12 +17,12 @@ public class JpaUserAdapter extends JpaAttributesAdapter<UserAttributeEntity> im
 
     @Override
     public Long getId() {
-        return getEntity().id;
+        return getEntity().getId();
     }
 
     @Override
     public void setId(Long id) {
-        getEntity().id = id;
+        getEntity().setId(id);
     }
 
     @Override

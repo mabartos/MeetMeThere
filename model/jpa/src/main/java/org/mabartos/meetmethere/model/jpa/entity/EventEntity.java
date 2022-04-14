@@ -3,13 +3,13 @@ package org.mabartos.meetmethere.model.jpa.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.experimental.Accessors;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Fetch;
@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "EVENT")
@@ -37,9 +38,9 @@ public class EventEntity extends BaseEntity implements HasAttributesEntity<Event
 
     private boolean isPublic = false;
 
-    @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "event")
+    @ManyToMany(mappedBy = "event")
     @BatchSize(size = 20)
-    private Set<EventOrganizerEntity> organizers = new HashSet<>();
+    private Set<UserEntity> organizers = new HashSet<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;
