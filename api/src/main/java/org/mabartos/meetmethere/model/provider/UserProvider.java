@@ -12,7 +12,7 @@ public interface UserProvider {
 
     Set<UserModel> getUsers(int firstResult, int maxResults);
 
-    int getUsersCount();
+    long getUsersCount();
 
     void createUser(UserModel user);
 
