@@ -12,6 +12,8 @@
     <modules>
         <module>api</module>
         <module>model</module>
+        <module>interaction</module>
+        <module>service</module>
     </modules>
 
     <properties>
