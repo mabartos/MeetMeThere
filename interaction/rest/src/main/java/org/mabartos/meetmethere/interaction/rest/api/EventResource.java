@@ -1,6 +1,6 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
-import org.mabartos.meetmethere.interaction.rest.api.dto.Event;
+import org.mabartos.meetmethere.dto.Event;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;

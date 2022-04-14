@@ -6,8 +6,6 @@ import org.mabartos.meetmethere.model.jpa.entity.attribute.AttributeContent;
 import org.mabartos.meetmethere.model.jpa.entity.attribute.HasAttributesEntity;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 
 public class JpaAttributesAdapter<Type extends AttributeContent> implements HasAttributes {
@@ -22,13 +20,7 @@ public class JpaAttributesAdapter<Type extends AttributeContent> implements HasA
     }
 
     @Override
-    public void setSingleAttribute(String key, String value) {
-        //TODO
-    }
-
-    @Override
-    public void setAttribute(String name, List<String> values) {
-        //TODO
+    public void setAttribute(String key, String value) {
 
     }
 
@@ -39,7 +31,12 @@ public class JpaAttributesAdapter<Type extends AttributeContent> implements HasA
     }
 
     @Override
-    public Map<String, List<String>> getAttributes() {
-        return Collections.emptyMap();
+    public Map<String, String> getAttributes() {
+        return null;
+    }
+
+    @Override
+    public void setAttributes(Map<String, String> attributes) {
+
     }
 }

@@ -1,6 +1,6 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
-import org.mabartos.meetmethere.interaction.rest.api.dto.Event;
+import org.mabartos.meetmethere.dto.Event;
 import org.mabartos.meetmethere.model.Coordinates;
 
 import javax.ws.rs.Consumes;

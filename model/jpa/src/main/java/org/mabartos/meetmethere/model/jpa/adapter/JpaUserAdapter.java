@@ -1,11 +1,18 @@
 package org.mabartos.meetmethere.model.jpa.adapter;
 
 import jakarta.persistence.EntityManager;
+import org.mabartos.meetmethere.model.EventModel;
 import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.jpa.JpaModel;
+import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.model.jpa.entity.attribute.UserAttributeEntity;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
+
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class JpaUserAdapter extends JpaAttributesAdapter<UserAttributeEntity> implements UserModel, JpaModel<UserEntity> {
     private final UserEntity entity;
@@ -63,6 +70,28 @@ public class JpaUserAdapter extends JpaAttributesAdapter<UserAttributeEntity> im
     @Override
     public void setEmail(String email) {
         getEntity().setEmail(email);
+    }
+
+    @Override
+    public Set<EventModel> getOrganizedEvents() {
+        return getEntity().getOrganizedEvents()
+                .stream()
+                .filter(Objects::nonNull)
+                .map(f -> new JpaEventAdapter(session, em, f))
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void setOrganizedEvents(Set<EventModel> events) {
+        final Set<EventEntity> entities = events.stream()
+                .filter(Objects::nonNull)
+                .map(f -> EventEntity.findByIdOptional(f.getId()))
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(f -> (EventEntity) f)
+                .collect(Collectors.toSet());
+
+        getEntity().setOrganizedEvents(entities);
     }
 
     @Override

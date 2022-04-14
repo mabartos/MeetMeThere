@@ -1,8 +1,10 @@
 package org.mabartos.meetmethere.service.rest;
 
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
 import org.mabartos.meetmethere.interaction.rest.api.UsersResource;
-import org.mabartos.meetmethere.interaction.rest.api.dto.User;
+import org.mabartos.meetmethere.dto.User;
 import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
@@ -16,7 +18,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.Set;
 
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
@@ -56,19 +57,19 @@ public class UsersResourceProvider implements UsersResource {
     }
 
     @GET
-    public Set<User> getUsers(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults) {
+    public Multi<User> getUsers(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults) {
         return null;
         //return session.users().getUsers(firstResult, maxResults);
     }
 
     @GET
     @Path("/count")
-    public long getUsersCount() {
-        return session.users().getUsersCount();
+    public Uni<Long> getUsersCount() {
+        return Uni.createFrom().item(session.users().getUsersCount());
     }
 
     @POST
-    public User createUser(User user) {
+    public Uni<User> createUser(User user) {
         return null;
         //return session.users().createUser(user);
     }

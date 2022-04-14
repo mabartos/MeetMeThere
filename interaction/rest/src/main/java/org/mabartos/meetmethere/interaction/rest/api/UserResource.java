@@ -1,6 +1,7 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
-import org.mabartos.meetmethere.interaction.rest.api.dto.User;
+import io.smallrye.mutiny.Uni;
+import org.mabartos.meetmethere.dto.User;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -14,11 +15,11 @@ import javax.ws.rs.core.MediaType;
 public interface UserResource {
 
     @GET
-    User getUser();
+    Uni<User> getUser();
 
     @DELETE
     void removeUser();
 
     @PATCH
-    User updateUser(User user);
+    Uni<User> updateUser(User user);
 }
