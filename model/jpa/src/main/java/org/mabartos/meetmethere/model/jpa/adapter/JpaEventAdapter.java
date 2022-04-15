@@ -10,7 +10,6 @@ import org.mabartos.meetmethere.model.jpa.JpaModel;
 import org.mabartos.meetmethere.model.jpa.entity.AddressEntity;
 import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
-import org.mabartos.meetmethere.model.jpa.entity.attribute.EventAttributeEntity;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
 import java.time.LocalDateTime;
@@ -21,11 +20,14 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class JpaEventAdapter extends JpaAttributesAdapter<EventAttributeEntity> implements EventModel, JpaModel<EventEntity> {
+public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
+    private final MeetMeThereSession session;
+    private final EntityManager em;
     private final EventEntity entity;
 
     public JpaEventAdapter(MeetMeThereSession session, EntityManager em, EventEntity entity) {
-        super(session, em, entity);
+        this.session = session;
+        this.em = em;
         this.entity = entity;
     }
 
@@ -166,5 +168,25 @@ public class JpaEventAdapter extends JpaAttributesAdapter<EventAttributeEntity> 
     @Override
     public EventEntity getEntity() {
         return entity;
+    }
+
+    @Override
+    public void setAttribute(String key, String value) {
+        getEntity().getAttributes().put(key, value);
+    }
+
+    @Override
+    public void removeAttribute(String name) {
+        getEntity().getAttributes().remove(name);
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
+        return getEntity().getAttributes();
+    }
+
+    @Override
+    public void setAttributes(Map<String, String> attributes) {
+        getEntity().setAttributes(attributes);
     }
 }

@@ -2,7 +2,7 @@ package org.mabartos.meetmethere.model;
 
 import java.util.Set;
 
-public interface UserModel extends HasAttributes, HasId {
+public interface UserModel extends HasAttributes<String, String>, HasId<Long> {
 
     String getUsername();
 

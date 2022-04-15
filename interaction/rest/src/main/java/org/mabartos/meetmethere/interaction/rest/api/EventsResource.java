@@ -1,5 +1,7 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.dto.Event;
 import org.mabartos.meetmethere.model.Coordinates;
 
@@ -23,7 +25,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 public interface EventsResource {
 
     @GET
-    Set<Event> getEvents(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults);
+    Multi<Event> getEvents(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults);
 
     @GET
     @Path("/{id}")
@@ -31,13 +33,17 @@ public interface EventsResource {
 
     @GET
     @Path("/{title}")
-    Set<Event> searchEventsByTitle(@PathParam("title") String title);
+    Multi<Event> searchEventsByTitle(@PathParam("title") String title);
 
     @GET
     @Path("/coordinates")
-    Set<Event> searchEventsByCoordinates(Coordinates coordinates);
+    Multi<Event> searchEventsByCoordinates(Coordinates coordinates);
 
     @POST
-    Event createEvent(Event event);
+    Uni<Event> createEvent(Event event);
+
+    @GET
+    @Path("/count")
+    Uni<Long> getEventsCount();
 
 }

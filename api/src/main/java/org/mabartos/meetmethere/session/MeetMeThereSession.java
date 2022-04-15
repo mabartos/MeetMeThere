@@ -6,6 +6,7 @@ import org.mabartos.meetmethere.model.provider.InvitationProvider;
 import org.mabartos.meetmethere.model.provider.UserProvider;
 
 public interface MeetMeThereSession {
+    <T> T getProvider(Class<T> clazz);
 
     UserProvider users();
 

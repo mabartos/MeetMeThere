@@ -2,7 +2,7 @@ package org.mabartos.meetmethere.model;
 
 import org.mabartos.meetmethere.enums.ResponseType;
 
-public interface InvitationModel extends HasId{
+public interface InvitationModel extends HasId<Long> {
 
     EventModel getEvent();
 

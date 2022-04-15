@@ -6,19 +6,22 @@ import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.jpa.JpaModel;
 import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
-import org.mabartos.meetmethere.model.jpa.entity.attribute.UserAttributeEntity;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class JpaUserAdapter extends JpaAttributesAdapter<UserAttributeEntity> implements UserModel, JpaModel<UserEntity> {
+public class JpaUserAdapter implements UserModel, JpaModel<UserEntity> {
+    private final MeetMeThereSession session;
+    private final EntityManager em;
     private final UserEntity entity;
 
     public JpaUserAdapter(MeetMeThereSession session, EntityManager em, UserEntity entity) {
-        super(session, em, entity);
+        this.session = session;
+        this.em = em;
         this.entity = entity;
     }
 
@@ -97,5 +100,25 @@ public class JpaUserAdapter extends JpaAttributesAdapter<UserAttributeEntity> im
     @Override
     public UserEntity getEntity() {
         return entity;
+    }
+
+    @Override
+    public void setAttribute(String key, String value) {
+
+    }
+
+    @Override
+    public void removeAttribute(String name) {
+
+    }
+
+    @Override
+    public Map<String, String> getAttributes() {
+        return null;
+    }
+
+    @Override
+    public void setAttributes(Map<String, String> attributes) {
+
     }
 }

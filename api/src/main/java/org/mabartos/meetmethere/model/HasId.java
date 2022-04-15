@@ -1,8 +1,8 @@
 package org.mabartos.meetmethere.model;
 
-public interface HasId {
+public interface HasId<Type> {
 
-    Long getId();
+    Type getId();
 
-    void setId(Long id);
+    void setId(Type id);
 }

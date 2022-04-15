@@ -2,12 +2,12 @@ package org.mabartos.meetmethere.model;
 
 import java.util.Map;
 
-public interface HasAttributes {
-    void setAttribute(String key, String value);
+public interface HasAttributes<Key, Value> {
+    void setAttribute(Key key, Value value);
 
-    void removeAttribute(String name);
+    void removeAttribute(Key name);
 
-    Map<String, String> getAttributes();
+    Map<Key, Value> getAttributes();
 
-    void setAttributes(Map<String, String> attributes);
+    void setAttributes(Map<Key, Value> attributes);
 }

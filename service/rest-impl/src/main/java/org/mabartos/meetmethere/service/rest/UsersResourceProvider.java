@@ -2,12 +2,16 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import org.mabartos.meetmethere.ModelToDto;
+import org.mabartos.meetmethere.dto.User;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
 import org.mabartos.meetmethere.interaction.rest.api.UsersResource;
-import org.mabartos.meetmethere.dto.User;
 import org.mabartos.meetmethere.model.UserModel;
+import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
+import javax.enterprise.context.RequestScoped;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
@@ -19,14 +23,16 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import static org.mabartos.meetmethere.DtoToModel.updateModel;
+import static org.mabartos.meetmethere.ModelToDto.toDto;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;
 
-//TODO
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@RequestScoped
 public class UsersResourceProvider implements UsersResource {
 
     @Context
@@ -58,8 +64,15 @@ public class UsersResourceProvider implements UsersResource {
 
     @GET
     public Multi<User> getUsers(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults) {
-        return null;
-        //return session.users().getUsers(firstResult, maxResults);
+        return Multi.createFrom()
+                .items(session.users()
+                        .getUsers(firstResult, maxResults)
+                        .stream()
+                        .map(ModelToDto::toDto)
+                        .distinct()
+                        .toArray())
+                .onItem()
+                .castTo(User.class);
     }
 
     @GET
@@ -70,7 +83,15 @@ public class UsersResourceProvider implements UsersResource {
 
     @POST
     public Uni<User> createUser(User user) {
-        return null;
-        //return session.users().createUser(user);
+        try {
+            UserModel model = session.users().createUser(user.getEmail(), user.getUsername());
+            updateModel(user, model);
+
+            session.users().updateUser(model);
+
+            return Uni.createFrom().item(toDto(session.users().getUserById(user.getId())));
+        } catch (ModelDuplicateException e) {
+            throw new BadRequestException("User already exists.");
+        }
     }
 }

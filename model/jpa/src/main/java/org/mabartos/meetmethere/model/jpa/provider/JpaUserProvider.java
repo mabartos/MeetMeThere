@@ -2,20 +2,28 @@ package org.mabartos.meetmethere.model.jpa.provider;
 
 import jakarta.persistence.EntityManager;
 import org.mabartos.meetmethere.model.UserModel;
+import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
+import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
 import org.mabartos.meetmethere.model.jpa.adapter.JpaUserAdapter;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.model.provider.UserProvider;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static org.mabartos.meetmethere.UpdateUtil.update;
+
+@ApplicationScoped
 public class JpaUserProvider implements UserProvider {
     private final MeetMeThereSession session;
     private final EntityManager em;
 
+    @Inject
     public JpaUserProvider(MeetMeThereSession session, EntityManager em) {
         this.session = session;
         this.em = em;
@@ -30,6 +38,15 @@ public class JpaUserProvider implements UserProvider {
     public UserModel getUserByUsername(String username) {
         final UserEntity user = em.createQuery("select u from UserEntity u where u.username=:username", UserEntity.class)
                 .setParameter("username", username)
+                .getSingleResult();
+
+        return new JpaUserAdapter(session, em, user);
+    }
+
+    @Override
+    public UserModel getUserByEmail(String email) {
+        final UserEntity user = em.createQuery("select u from UserEntity u where u.email=:email", UserEntity.class)
+                .setParameter("email", email)
                 .getSingleResult();
 
         return new JpaUserAdapter(session, em, user);
@@ -54,30 +71,61 @@ public class JpaUserProvider implements UserProvider {
     }
 
     @Override
-    public void createUser(UserModel user) {
-        UserEntity entity = convertUser(user);
+    public UserModel createUser(String email, String username) throws ModelDuplicateException {
+        if (getUserByEmail(email) != null || getUserByUsername(username) != null) {
+            throw new ModelDuplicateException("Duplicate user");
+        }
 
-        //TODO add attributes,..
+        UserEntity entity = new UserEntity();
+        entity.setEmail(email);
+        entity.setUsername(username);
+
         em.persist(entity);
+        em.flush();
+
+        return new JpaUserAdapter(session, em, entity);
+    }
+
+    @Override
+    public UserModel createUser(UserModel user) throws ModelDuplicateException {
+        if (UserEntity.findByIdOptional(user.getId()).isPresent()) {
+            throw new ModelDuplicateException("Duplicate user");
+        }
+
+        UserEntity entity = convertEntity(user);
+        em.persist(entity);
+        em.flush();
+
+        return new JpaUserAdapter(session, em, entity);
+    }
+
+    @Override
+    public void removeUser(Long id) throws ModelNotFoundException {
+        if (!UserEntity.deleteById(id)) throw new ModelNotFoundException("Cannot find User");
+    }
+
+    @Override
+    public void updateUser(UserModel user) {
+        UserEntity entity = UserEntity.<UserEntity>findByIdOptional(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("Cannot update User"));
+
+        convertUser(entity, user);
+
+        em.merge(entity);
         em.flush();
     }
 
-    @Override
-    public void removeUser(Long id) {
-        UserEntity.deleteById(id);
+    private static void convertUser(UserEntity entity, UserModel model) {
+        update(entity::setEmail, model::getEmail);
+        update(entity::setUsername, model::getUsername);
+        update(entity::setFirstName, model::getFirstName);
+        update(entity::setLastName, model::getLastName);
+        update(entity::setAttributes, model::getAttributes);
     }
 
-    @Override
-    public void updateUser(Long id, UserModel user) {
-        //TODO
-    }
-
-    private UserEntity convertUser(UserModel model) {
+    private static UserEntity convertEntity(UserModel model) {
         UserEntity entity = new UserEntity();
-        entity.setEmail(model.getEmail());
-        entity.setUsername(model.getUsername());
-        entity.setFirstName(model.getFirstName());
-        entity.setLastName(model.getLastName());
+        convertUser(entity, model);
         return entity;
     }
 }

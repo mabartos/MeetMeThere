@@ -11,6 +11,9 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
+
+    private Long id;
+
     private String username;
 
     private String email;

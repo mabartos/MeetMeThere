@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Set;
 
-public interface EventModel extends HasId, HasAttributes {
+public interface EventModel extends HasId<Long>, HasAttributes<String, String> {
 
     UserModel getCreatedBy();
 
