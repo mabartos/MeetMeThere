@@ -21,13 +21,14 @@ import static org.mabartos.meetmethere.UpdateUtil.update;
 @ApplicationScoped
 public class JpaEventProvider implements EventProvider {
 
-    private final MeetMeThereSession session;
-    private final EntityManager em;
-
     @Inject
+    MeetMeThereSession session;
+
+    EntityManager em;
+
     public JpaEventProvider(MeetMeThereSession session, EntityManager em) {
         this.session = session;
-        this.em = em;
+        this.em = session.getProvider(EntityManager.class);
     }
 
     @Override

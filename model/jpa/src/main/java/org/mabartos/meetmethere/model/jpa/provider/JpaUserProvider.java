@@ -9,8 +9,6 @@ import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.model.provider.UserProvider;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -18,12 +16,10 @@ import java.util.stream.Collectors;
 
 import static org.mabartos.meetmethere.UpdateUtil.update;
 
-@ApplicationScoped
 public class JpaUserProvider implements UserProvider {
     private final MeetMeThereSession session;
     private final EntityManager em;
 
-    @Inject
     public JpaUserProvider(MeetMeThereSession session, EntityManager em) {
         this.session = session;
         this.em = em;

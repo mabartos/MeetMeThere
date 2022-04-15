@@ -11,6 +11,7 @@ import org.mabartos.meetmethere.model.EventModel;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
 import javax.enterprise.context.RequestScoped;
+import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -34,10 +35,17 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequestScoped
+@Transactional
 public class EventsResourceProvider implements EventsResource {
 
     @Context
     MeetMeThereSession session;
+
+    @GET
+    @Path("/test")
+    public Uni<String> here() {
+        return Uni.createFrom().item("AHOJ");
+    }
 
     @GET
     public Multi<Event> getEvents(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults) {

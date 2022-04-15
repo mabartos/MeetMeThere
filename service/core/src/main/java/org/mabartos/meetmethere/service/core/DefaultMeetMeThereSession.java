@@ -1,5 +1,7 @@
 package org.mabartos.meetmethere.service.core;
 
+/*import javax.persistence.EntityManager;
+import org.mabartos.meetmethere.model.jpa.provider.JpaEventProvider;*/
 import org.mabartos.meetmethere.model.provider.AddressProvider;
 import org.mabartos.meetmethere.model.provider.EventProvider;
 import org.mabartos.meetmethere.model.provider.InvitationProvider;
