@@ -5,6 +5,7 @@ import org.mabartos.meetmethere.dto.Event;
 import org.mabartos.meetmethere.dto.EventInvitation;
 import org.mabartos.meetmethere.dto.User;
 import org.mabartos.meetmethere.model.AddressModel;
+import org.mabartos.meetmethere.model.Coordinates;
 import org.mabartos.meetmethere.model.EventModel;
 import org.mabartos.meetmethere.model.HasId;
 import org.mabartos.meetmethere.model.InvitationModel;
@@ -56,7 +57,10 @@ public class ModelToDto {
         update(address::setZipCode, model::getZipCode);
         update(address::setStreet, model::getStreet);
         update(address::setStreetNumber, model::getStreetNumber);
-        update(address::setCoordinates, model::getCoordinates);
+
+        final Coordinates coordinates = model.getCoordinates();
+        update(address::setLongitude, coordinates::getLongitude);
+        update(address::setLatitude, coordinates::getLatitude);
         return address;
     }
 

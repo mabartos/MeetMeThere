@@ -24,11 +24,9 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Transactional
 public interface UsersResource {
 
-    @GET
     @Path("/{id}")
     UserResource getUserById(@PathParam(ID) Long id);
 
-    @GET
     @Path("/{username}")
     UserResource getUserByUsername(@PathParam("username") String username);
 

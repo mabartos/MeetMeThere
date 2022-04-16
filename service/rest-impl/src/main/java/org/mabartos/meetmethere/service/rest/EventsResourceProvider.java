@@ -54,8 +54,7 @@ public class EventsResourceProvider implements EventsResource {
                 .castTo(Event.class);
     }
 
-    @GET
-    @Path("/{id}")
+    @Path("{id}")
     public EventResource getEventById(@PathParam(ID) Long id) {
         final EventModel event = session.events().getEventById(id);
 
@@ -71,10 +70,6 @@ public class EventsResourceProvider implements EventsResource {
     public Multi<Event> searchEventsByTitle(@PathParam("title") String title) {
         final Set<EventModel> events = session.events().searchByTitle(title);
 
-        if (events == null || events.isEmpty()) {
-            throw new NotFoundException("Cannot find events by a particular title.");
-        }
-
         return Multi.createFrom()
                 .items(events.stream().map(ModelToDto::toDto))
                 .onItem()
@@ -83,8 +78,13 @@ public class EventsResourceProvider implements EventsResource {
 
     @GET
     @Path("/coordinates")
-    public Multi<Event> searchEventsByCoordinates(Coordinates coordinates) {
-        final Set<EventModel> events = session.events().searchByCoordinates(coordinates);
+    public Multi<Event> searchEventsByCoordinates(@QueryParam("longitude") Double longitude,
+                                                  @QueryParam("latitude") Double latitude) {
+        if (longitude == null || latitude == null) {
+            throw new BadRequestException("You need to specify both longitude and latitude.");
+        }
+
+        final Set<EventModel> events = session.events().searchByCoordinates(new Coordinates(longitude, latitude));
 
         return Multi.createFrom()
                 .items(events.stream().map(ModelToDto::toDto))

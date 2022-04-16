@@ -1,25 +1,28 @@
 package org.mabartos.meetmethere.model;
 
-import lombok.Getter;
-import lombok.Setter;
+public interface AddressModel {
 
-@Setter
-@Getter
-public class AddressModel {
+    String getCountry();
 
-    private String country;
+    void setCountry(String country);
 
-    private String city;
+    String getCity();
 
-    private String zipCode;
+    void setCity(String city);
 
-    private String street;
+    String getZipCode();
 
-    private String streetNumber;
+    void setZipCode(String zipCode);
 
-    private Coordinates coordinates;
+    String getStreet();
 
-    public AddressModel(String country) {
-        this.country = country;
-    }
+    void setStreet(String street);
+
+    String getStreetNumber();
+
+    void setStreetNumber(String streetNumber);
+
+    Coordinates getCoordinates();
+
+    void setCoordinates(Coordinates coordinates);
 }

@@ -35,7 +35,6 @@ public interface EventInvitationsResource {
     @DELETE
     void removeInvitations();
 
-    @GET
     @Path("/{id}")
     EventInvitationResource getInvitationById(@PathParam(ID) Long id);
 }

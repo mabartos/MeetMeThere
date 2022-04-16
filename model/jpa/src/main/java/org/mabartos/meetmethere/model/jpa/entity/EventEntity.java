@@ -3,6 +3,7 @@ package org.mabartos.meetmethere.model.jpa.entity;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
@@ -64,6 +65,7 @@ public class EventEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = UserEntity.class)
     private UserEntity creator;
 
+    @Embedded
     private AddressEntity venue;
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "event")

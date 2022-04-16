@@ -6,7 +6,6 @@ import org.mabartos.meetmethere.model.EventModel;
 import org.mabartos.meetmethere.model.InvitationModel;
 import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.jpa.JpaModel;
-import org.mabartos.meetmethere.model.jpa.entity.AddressEntity;
 import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
@@ -124,12 +123,12 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
 
     @Override
     public AddressModel getVenue() {
-        return getEntity().getVenue();
+        return new JpaAddressAdapter(getEntity().getVenue());
     }
 
     @Override
     public void setVenue(AddressModel venue) {
-        getEntity().setVenue(new AddressEntity(venue));
+        getEntity().setVenue(JpaAddressAdapter.toEntity(venue));
     }
 
     @Override
