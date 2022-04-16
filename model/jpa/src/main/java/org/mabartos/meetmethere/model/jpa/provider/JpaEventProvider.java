@@ -1,6 +1,7 @@
 package org.mabartos.meetmethere.model.jpa.provider;
 
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
+
 import org.mabartos.meetmethere.model.Coordinates;
 import org.mabartos.meetmethere.model.EventModel;
 import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
@@ -10,25 +11,20 @@ import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.provider.EventProvider;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.inject.Inject;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.mabartos.meetmethere.UpdateUtil.update;
 
-@ApplicationScoped
 public class JpaEventProvider implements EventProvider {
 
-    @Inject
-    MeetMeThereSession session;
-
-    EntityManager em;
+    private final MeetMeThereSession session;
+    private final EntityManager em;
 
     public JpaEventProvider(MeetMeThereSession session, EntityManager em) {
         this.session = session;
-        this.em = session.getProvider(EntityManager.class);
+        this.em = em;
     }
 
     @Override

@@ -7,12 +7,19 @@ import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
+import javax.transaction.Transactional;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.NotFoundException;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static org.mabartos.meetmethere.DtoToModel.updateModel;
 import static org.mabartos.meetmethere.ModelToDto.toDto;
 
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
+@Transactional
 public class UserResourceProvider implements UserResource {
     private final MeetMeThereSession session;
     private final UserModel user;

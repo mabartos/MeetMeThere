@@ -4,6 +4,7 @@ import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.dto.User;
 
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -20,6 +21,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Transactional
 public interface UsersResource {
 
     @GET
@@ -31,7 +33,7 @@ public interface UsersResource {
     UserResource getUserByUsername(@PathParam("username") String username);
 
     @GET
-    Multi<User> getUsers(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults);
+    Multi<User> getUsers(@QueryParam(FIRST_RESULT) Integer firstResult, @QueryParam(MAX_RESULTS) Integer maxResults);
 
     @GET
     @Path("/count")

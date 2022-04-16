@@ -11,6 +11,7 @@ import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
 import javax.enterprise.context.RequestScoped;
+import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -33,6 +34,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @RequestScoped
+@Transactional
 public class UsersResourceProvider implements UsersResource {
 
     @Context
@@ -63,7 +65,11 @@ public class UsersResourceProvider implements UsersResource {
     }
 
     @GET
-    public Multi<User> getUsers(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults) {
+    public Multi<User> getUsers(@QueryParam(FIRST_RESULT) Integer firstResult,
+                                @QueryParam(MAX_RESULTS) Integer maxResults) {
+        firstResult = firstResult != null ? firstResult : 0;
+        maxResults = maxResults != null ? maxResults : Integer.MAX_VALUE;
+
         return Multi.createFrom()
                 .items(session.users()
                         .getUsers(firstResult, maxResults)

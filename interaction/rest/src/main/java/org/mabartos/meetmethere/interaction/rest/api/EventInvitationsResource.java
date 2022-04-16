@@ -2,6 +2,7 @@ package org.mabartos.meetmethere.interaction.rest.api;
 
 import org.mabartos.meetmethere.dto.EventInvitation;
 
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -19,6 +20,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Transactional
 public interface EventInvitationsResource {
 
     @GET

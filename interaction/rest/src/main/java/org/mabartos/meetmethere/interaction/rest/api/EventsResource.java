@@ -5,6 +5,7 @@ import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.dto.Event;
 import org.mabartos.meetmethere.model.Coordinates;
 
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -22,6 +23,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Path("/events")
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
+@Transactional
 public interface EventsResource {
 
     @GET

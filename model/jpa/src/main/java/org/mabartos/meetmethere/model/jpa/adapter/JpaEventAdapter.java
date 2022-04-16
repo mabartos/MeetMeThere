@@ -1,6 +1,6 @@
 package org.mabartos.meetmethere.model.jpa.adapter;
 
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
 import org.mabartos.meetmethere.enums.ResponseType;
 import org.mabartos.meetmethere.model.AddressModel;
 import org.mabartos.meetmethere.model.EventModel;

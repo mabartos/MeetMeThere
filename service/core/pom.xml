@@ -10,14 +10,14 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>core</artifactId>
+
     <dependencies>
-       <!-- <dependency>
+        <!--TODO REMOVE LATER-->
+        <dependency>
             <groupId>org.mabartos.meetmethere</groupId>
             <artifactId>jpa</artifactId>
-            <version>1.0-SNAPSHOT</version>
-            <scope>compile</scope>
-        </dependency>-->
-
+            <version>${project.version}</version>
+        </dependency>
     </dependencies>
 
     <properties>

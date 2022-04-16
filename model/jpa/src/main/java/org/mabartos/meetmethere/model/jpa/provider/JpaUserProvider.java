@@ -1,6 +1,7 @@
 package org.mabartos.meetmethere.model.jpa.provider;
 
-import jakarta.persistence.EntityManager;
+import javax.persistence.EntityManager;
+
 import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.model.exception.ModelNotFoundException;

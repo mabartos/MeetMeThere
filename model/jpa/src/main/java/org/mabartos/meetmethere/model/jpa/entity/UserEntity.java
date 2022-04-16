@@ -1,10 +1,10 @@
 package org.mabartos.meetmethere.model.jpa.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.ManyToMany;
+import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -32,7 +32,7 @@ public class UserEntity extends BaseEntity {
 
     private String lastName;
 
-    @OneToMany(mappedBy = "organizer")
+    @ManyToMany(mappedBy = "organizers")
     @BatchSize(size = 20)
     private Set<EventEntity> organizedEvents = new HashSet<>();
 
