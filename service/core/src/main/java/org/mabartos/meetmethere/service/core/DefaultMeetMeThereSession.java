@@ -5,7 +5,6 @@ import org.mabartos.meetmethere.model.jpa.provider.JpaEventProvider;*/
 
 import org.mabartos.meetmethere.model.jpa.provider.JpaEventProviderFactory;
 import org.mabartos.meetmethere.model.jpa.provider.JpaUserProviderFactory;
-import org.mabartos.meetmethere.model.provider.AddressProvider;
 import org.mabartos.meetmethere.model.provider.EventProvider;
 import org.mabartos.meetmethere.model.provider.InvitationProvider;
 import org.mabartos.meetmethere.model.provider.UserProvider;
@@ -36,11 +35,6 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
 
     @Override
     public InvitationProvider invitations() {
-        return null;
-    }
-
-    @Override
-    public AddressProvider addresses() {
         return null;
     }
 

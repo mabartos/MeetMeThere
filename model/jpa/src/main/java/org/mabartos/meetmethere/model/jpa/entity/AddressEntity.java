@@ -1,29 +1,28 @@
 package org.mabartos.meetmethere.model.jpa.entity;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.mabartos.meetmethere.model.AddressModel;
 
-@Entity
-@Table(name = "ADDRESS")
-@NoArgsConstructor
-@Setter
-@Getter
-public class AddressEntity extends BaseEntity {
+import javax.persistence.Embeddable;
 
-    private String country;
+import static org.mabartos.meetmethere.UpdateUtil.update;
 
-    private String city;
+@Embeddable
+public class AddressEntity extends AddressModel {
+    public AddressEntity(String country) {
+        super(country);
+    }
 
-    private String zipCode;
+    public AddressEntity() {
+        super("");
+    }
 
-    private String street;
-
-    private String streetNumber;
-
-    private Double longitude;
-
-    private Double latitude;
+    public AddressEntity(AddressModel model) {
+        super(model.getCountry());
+        update(this::setCountry, model::getCountry);
+        update(this::setCity, model::getCity);
+        update(this::setZipCode, model::getZipCode);
+        update(this::setStreet, model::getStreet);
+        update(this::setStreetNumber, model::getStreetNumber);
+        update(this::setCoordinates, model::getCoordinates);
+    }
 }

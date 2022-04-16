@@ -28,4 +28,6 @@ public class InvitationEntity extends BaseEntity {
 
     @Enumerated
     private ResponseType responseType;
+
+    private String message;
 }

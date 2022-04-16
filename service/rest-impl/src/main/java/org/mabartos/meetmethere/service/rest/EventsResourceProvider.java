@@ -42,12 +42,6 @@ public class EventsResourceProvider implements EventsResource {
     MeetMeThereSession session;
 
     @GET
-    @Path("/test")
-    public Uni<String> here() {
-        return Uni.createFrom().item("AHOJ");
-    }
-
-    @GET
     public Multi<Event> getEvents(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults) {
         return Multi.createFrom()
                 .items(session.events()
@@ -76,6 +70,10 @@ public class EventsResourceProvider implements EventsResource {
     @Path("/{title}")
     public Multi<Event> searchEventsByTitle(@PathParam("title") String title) {
         final Set<EventModel> events = session.events().searchByTitle(title);
+
+        if (events == null || events.isEmpty()) {
+            throw new NotFoundException("Cannot find events by a particular title.");
+        }
 
         return Multi.createFrom()
                 .items(events.stream().map(ModelToDto::toDto))

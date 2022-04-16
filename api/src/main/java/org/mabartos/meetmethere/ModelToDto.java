@@ -6,6 +6,7 @@ import org.mabartos.meetmethere.dto.EventInvitation;
 import org.mabartos.meetmethere.dto.User;
 import org.mabartos.meetmethere.model.AddressModel;
 import org.mabartos.meetmethere.model.EventModel;
+import org.mabartos.meetmethere.model.HasId;
 import org.mabartos.meetmethere.model.InvitationModel;
 import org.mabartos.meetmethere.model.UserModel;
 
@@ -22,8 +23,7 @@ public class ModelToDto {
         update(user::setLastName, model::getLastName);
         update(user::setAttributes, model::getAttributes);
 
-        update(user::setOrganizedEvents, () -> model.getOrganizedEvents().stream().map(ModelToDto::toDto).collect(Collectors.toSet()));
-
+        update(user::setOrganizedEventsId, () -> model.getOrganizedEvents().stream().map(HasId::getId).collect(Collectors.toSet()));
         return user;
     }
 
@@ -33,29 +33,37 @@ public class ModelToDto {
         update(event::setDescription, model::getDescription);
         update(event::setPublic, model::isPublic);
         update(event::setVenue, () -> toDto(model.getVenue()));
+
         update(event::setUpdatedAt, model::getUpdatedAt);
-        update(event::setUpdatedBy, () -> toDto(model.getUpdatedBy()));
+        final UserModel updatedBy = model.getUpdatedBy();
+        update(event::setUpdatedById, updatedBy::getId);
+        update(event::setUpdatedByName, () -> String.format("%s %s", updatedBy.getFirstName(), updatedBy.getLastName()));
 
         update(event::setStartTime, model::getStartTime);
         update(event::setEndTime, model::getEndTime);
 
         update(event::setAttributes, model::getAttributes);
 
-        update(event::setInvitations, () -> model.getInvitations().stream().map(ModelToDto::toDto).collect(Collectors.toSet()));
-        update(event::setOrganizers, () -> model.getOrganizers().stream().map(ModelToDto::toDto).collect(Collectors.toSet()));
+        update(event::setInvitationsId, () -> model.getInvitations().stream().map(HasId::getId).collect(Collectors.toSet()));
+        update(event::setOrganizersId, () -> model.getOrganizers().stream().map(HasId::getId).collect(Collectors.toSet()));
 
         return event;
     }
 
     public static Address toDto(AddressModel model) {
         Address address = new Address(model.getCountry());
-
+        update(address::setCity, model::getCity);
+        update(address::setZipCode, model::getZipCode);
+        update(address::setStreet, model::getStreet);
+        update(address::setStreetNumber, model::getStreetNumber);
+        update(address::setCoordinates, model::getCoordinates);
         return address;
     }
 
     public static EventInvitation toDto(InvitationModel model) {
         EventInvitation eventInvitation = new EventInvitation(toDto(model.getEvent()), toDto(model.getSender()), toDto(model.getReceiver()));
-        eventInvitation.setResponseType(model.getResponseType());
+        update(eventInvitation::setResponseType, model::getResponseType);
+        update(eventInvitation::setMessage, model::getMessage);
         return eventInvitation;
     }
 

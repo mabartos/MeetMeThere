@@ -3,6 +3,7 @@ package org.mabartos.meetmethere.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -10,7 +11,7 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class User {
+public class User implements Serializable {
 
     private Long id;
 
@@ -22,14 +23,18 @@ public class User {
 
     private String lastName;
 
-    private Set<Event> organizedEvents;
+    private Set<Long> organizedEventsId;
 
     private Map<String, String> attributes;
 
     public User(String username, String email) {
         this.username = username;
         this.email = email;
-        this.organizedEvents = new HashSet<>();
+        this.organizedEventsId = new HashSet<>();
         this.attributes = new HashMap<>();
+    }
+
+    public String getFullName() {
+        return String.format("%s %s", firstName, lastName);
     }
 }

@@ -1,28 +1,25 @@
 package org.mabartos.meetmethere.model;
 
-public interface AddressModel extends HasId<Long> {
+import lombok.Getter;
+import lombok.Setter;
 
-    String getCountry();
+@Setter
+@Getter
+public class AddressModel {
 
-    void setCountry(String country);
+    private String country;
 
-    String getCity();
+    private String city;
 
-    void setCity(String city);
+    private String zipCode;
 
-    String getZipCode();
+    private String street;
 
-    void setZipCode(String zipCode);
+    private String streetNumber;
 
-    String getStreet();
+    private Coordinates coordinates;
 
-    void setStreet(String street);
-
-    String getStreetNumber();
-
-    void setStreetNumber(String streetNumber);
-
-    Coordinates getCoordinates();
-
-    void setCoordinates(Coordinates coordinates);
+    public AddressModel(String country) {
+        this.country = country;
+    }
 }

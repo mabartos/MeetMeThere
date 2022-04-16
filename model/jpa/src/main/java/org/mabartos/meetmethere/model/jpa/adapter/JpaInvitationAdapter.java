@@ -73,6 +73,16 @@ public class JpaInvitationAdapter implements InvitationModel, JpaModel<Invitatio
     }
 
     @Override
+    public String getMessage() {
+        return getEntity().getMessage();
+    }
+
+    @Override
+    public void setMessage(String message) {
+        getEntity().setMessage(message);
+    }
+
+    @Override
     public InvitationEntity getEntity() {
         return entity;
     }

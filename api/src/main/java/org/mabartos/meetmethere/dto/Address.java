@@ -1,29 +1,27 @@
 package org.mabartos.meetmethere.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.mabartos.meetmethere.model.AddressModel;
+import org.mabartos.meetmethere.model.Coordinates;
+
+import java.io.Serializable;
 
 @Setter
 @Getter
-public class Address {
-
-    private Long id;
-
-    private String country;
-
-    private String city;
-
-    private String zipCode;
-
-    private String street;
-
-    private String streetNumber;
+public class Address extends AddressModel implements Serializable {
 
     private Double longitude;
 
     private Double latitude;
 
+    @JsonIgnore
+    public Coordinates getCoordinates() {
+        return super.getCoordinates();
+    }
+
     public Address(String country) {
-        this.country = country;
+        super(country);
     }
 }

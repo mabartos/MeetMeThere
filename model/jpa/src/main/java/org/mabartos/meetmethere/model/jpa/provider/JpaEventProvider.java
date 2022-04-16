@@ -110,7 +110,7 @@ public class JpaEventProvider implements EventProvider {
         return entities.stream().map(f -> new JpaEventAdapter(session, em, f)).collect(Collectors.toSet());
     }
 
-    private static void convertEvent(EventEntity entity, EventModel model) {
+    public static void convertEvent(EventEntity entity, EventModel model) {
         update(entity::setTitle, model::getEventTitle);
         update(entity::setDescription, model::getDescription);
         update(entity::setPublic, model::isPublic);

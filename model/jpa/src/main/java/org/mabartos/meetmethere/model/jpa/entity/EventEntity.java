@@ -64,7 +64,6 @@ public class EventEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = UserEntity.class)
     private UserEntity creator;
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = AddressEntity.class)
     private AddressEntity venue;
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "event")

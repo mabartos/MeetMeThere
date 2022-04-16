@@ -19,4 +19,8 @@ public interface InvitationModel extends HasId<Long> {
     ResponseType getResponseType();
 
     void setResponseType(ResponseType responseType);
+
+    String getMessage();
+
+    void setMessage(String message);
 }

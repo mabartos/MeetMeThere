@@ -3,6 +3,7 @@ package org.mabartos.meetmethere.dto;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @Setter
 @Getter
-public class Event {
+public class Event implements Serializable {
 
     private Long id;
 
@@ -21,7 +22,7 @@ public class Event {
 
     private boolean isPublic;
 
-    private Set<User> organizers;
+    private Set<Long> organizersId;
 
     private LocalDateTime createdAt;
 
@@ -31,22 +32,27 @@ public class Event {
 
     private LocalDateTime endTime;
 
-    private User updatedBy;
+    private String updatedByName;
 
-    private User creator;
+    private String createdByName;
+
+    private Long updatedById;
+
+    private Long createdById;
 
     private Address venue;
 
-    private Set<EventInvitation> invitations;
+    private Set<Long> invitationsId;
 
     private Map<String, String> attributes;
 
-    public Event(String title, User creator, LocalDateTime createdAt) {
+    public Event(String title, User createdBy, LocalDateTime createdAt) {
         this.title = title;
-        this.creator = creator;
+        this.createdByName = String.format("%s %s", createdBy.getFirstName(), createdBy.getLastName());
+        this.createdById = createdBy.getId();
         this.createdAt = createdAt;
-        this.organizers = new HashSet<>();
+        this.organizersId = new HashSet<>();
         this.attributes = new HashMap<>();
-        this.invitations = new HashSet<>();
+        this.invitationsId = new HashSet<>();
     }
 }
