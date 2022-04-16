@@ -54,15 +54,9 @@ public class EventsResourceProvider implements EventsResource {
                 .castTo(Event.class);
     }
 
-    @Path("{id}")
+    @Path("/{id}")
     public EventResource getEventById(@PathParam(ID) Long id) {
-        final EventModel event = session.events().getEventById(id);
-
-        if (event == null) {
-            throw new NotFoundException("Cannot find event with id: " + id);
-        }
-
-        return new EventResourceProvider(session, event);
+        return new EventResourceProvider(session, session.events().getEventById(id));
     }
 
     @GET

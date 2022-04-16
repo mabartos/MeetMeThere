@@ -1,5 +1,7 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
+import io.smallrye.mutiny.Multi;
+import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.dto.EventInvitation;
 
 import javax.transaction.Transactional;
@@ -12,7 +14,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
-import java.util.Set;
+import javax.ws.rs.core.Response;
 
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
@@ -24,17 +26,22 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 public interface EventInvitationsResource {
 
     @GET
-    Set<EventInvitation> getInvitations(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults);
+    Multi<EventInvitation> getInvitations(@QueryParam(FIRST_RESULT) int firstResult,
+                                          @QueryParam(MAX_RESULTS) int maxResults);
 
     @POST
-    EventInvitation createInvitation(EventInvitation invitation);
+    Uni<EventInvitation> createInvitation(EventInvitation invitation);
 
     @POST
-    EventInvitation sendInvitation(Long receiverId);
+    Uni<EventInvitation> sendInvitation(Long receiverId);
 
     @DELETE
-    void removeInvitations();
+    Response removeInvitations();
 
     @Path("/{id}")
     EventInvitationResource getInvitationById(@PathParam(ID) Long id);
+
+    @GET
+    @Path("/count")
+    Uni<Long> getInvitationsCount();
 }

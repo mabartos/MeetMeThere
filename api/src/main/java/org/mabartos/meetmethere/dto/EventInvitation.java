@@ -10,6 +10,8 @@ import java.io.Serializable;
 @Getter
 public class EventInvitation implements Serializable {
 
+    private Long id;
+
     private String eventTitle;
 
     private Long eventId;

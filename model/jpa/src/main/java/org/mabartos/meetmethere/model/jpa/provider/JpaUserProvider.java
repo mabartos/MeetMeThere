@@ -1,7 +1,5 @@
 package org.mabartos.meetmethere.model.jpa.provider;
 
-import javax.persistence.EntityManager;
-
 import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
@@ -10,12 +8,16 @@ import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.model.provider.UserProvider;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
+import javax.persistence.EntityManager;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.mabartos.meetmethere.UpdateUtil.update;
+import static org.mabartos.meetmethere.model.jpa.util.JpaUtil.catchNoResult;
 
 public class JpaUserProvider implements UserProvider {
     private final MeetMeThereSession session;
@@ -33,30 +35,39 @@ public class JpaUserProvider implements UserProvider {
 
     @Override
     public UserModel getUserByUsername(String username) {
-        final UserEntity user = em.createQuery("select u from UserEntity u where u.username=:username", UserEntity.class)
+        final Optional<UserEntity> user = catchNoResult(() -> em.createQuery("select u from UserEntity u where u.username=:username", UserEntity.class)
                 .setParameter("username", username)
-                .getSingleResult();
+                .getSingleResult()
+        );
 
-        return new JpaUserAdapter(session, em, user);
+        if (user.isEmpty()) return null;
+
+        return new JpaUserAdapter(session, em, user.get());
     }
 
     @Override
     public UserModel getUserByEmail(String email) {
-        final UserEntity user = em.createQuery("select u from UserEntity u where u.email=:email", UserEntity.class)
+        final Optional<UserEntity> user = catchNoResult(() -> em.createQuery("select u from UserEntity u where u.email=:email", UserEntity.class)
                 .setParameter("email", email)
-                .getSingleResult();
+                .getSingleResult()
+        );
 
-        return new JpaUserAdapter(session, em, user);
+        if (user.isEmpty()) return null;
+
+        return new JpaUserAdapter(session, em, user.get());
     }
 
     @Override
     public Set<UserModel> getUsers(int firstResult, int maxResults) {
-        final List<UserEntity> users = em.createQuery("select u from UserEntity u", UserEntity.class)
+        final Optional<List<UserEntity>> users = catchNoResult(() -> em.createQuery("select u from UserEntity u", UserEntity.class)
                 .setFirstResult(firstResult)
                 .setMaxResults(maxResults)
-                .getResultList();
+                .getResultList()
+        );
 
-        return users.stream()
+        if (users.isEmpty()) return Collections.emptySet();
+
+        return users.get().stream()
                 .filter(Objects::nonNull)
                 .map(f -> new JpaUserAdapter(session, em, f))
                 .collect(Collectors.toSet());
@@ -102,7 +113,7 @@ public class JpaUserProvider implements UserProvider {
     }
 
     @Override
-    public void updateUser(UserModel user) {
+    public UserModel updateUser(UserModel user) {
         UserEntity entity = UserEntity.<UserEntity>findByIdOptional(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Cannot update User"));
 
@@ -110,6 +121,8 @@ public class JpaUserProvider implements UserProvider {
 
         em.merge(entity);
         em.flush();
+
+        return new JpaUserAdapter(session, em, entity);
     }
 
     private static void convertUser(UserEntity entity, UserModel model) {

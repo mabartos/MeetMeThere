@@ -1,14 +1,26 @@
 package org.mabartos.meetmethere.model.provider;
 
+import org.mabartos.meetmethere.model.EventModel;
 import org.mabartos.meetmethere.model.InvitationModel;
+import org.mabartos.meetmethere.model.UserModel;
+import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
+import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
+
+import java.util.Set;
 
 public interface InvitationProvider {
 
     InvitationModel getInvitationById(Long id);
 
-    void createInvitation(InvitationModel invitation);
+    Set<InvitationModel> getInvitationsForEvent(Long eventId);
 
-    void removeInvitation(Long id);
+    InvitationModel createInvitation(InvitationModel invitation) throws ModelDuplicateException;
 
-    void updateInvitation(Long id, InvitationModel invitation);
+    InvitationModel createInvitation(EventModel event, UserModel sender, UserModel receiver);
+
+    void createInvitations(EventModel event, UserModel sender, Set<UserModel> receivers, String message);
+
+    void removeInvitation(Long id) throws ModelNotFoundException;
+
+    InvitationModel updateInvitation(InvitationModel invitation);
 }

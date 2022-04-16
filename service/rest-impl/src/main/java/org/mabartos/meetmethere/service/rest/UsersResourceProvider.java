@@ -43,13 +43,7 @@ public class UsersResourceProvider implements UsersResource {
     @GET
     @Path("/{id}")
     public UserResource getUserById(@PathParam(ID) Long id) {
-        final UserModel user = session.users().getUserById(id);
-
-        if (user == null) {
-            throw new NotFoundException("Cannot find user with id: " + id);
-        }
-
-        return new UserResourceProvider(session, user);
+        return new UserResourceProvider(session, session.users().getUserById(id));
     }
 
     @GET

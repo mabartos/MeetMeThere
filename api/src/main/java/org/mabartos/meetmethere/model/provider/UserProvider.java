@@ -24,5 +24,5 @@ public interface UserProvider {
 
     void removeUser(Long id) throws ModelNotFoundException;
 
-    void updateUser(UserModel user);
+    UserModel updateUser(UserModel user);
 }

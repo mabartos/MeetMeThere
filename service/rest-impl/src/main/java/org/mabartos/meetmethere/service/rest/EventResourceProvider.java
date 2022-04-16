@@ -2,6 +2,7 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.dto.Event;
+import org.mabartos.meetmethere.interaction.rest.api.EventInvitationsResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventResource;
 import org.mabartos.meetmethere.model.EventModel;
 import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
@@ -13,6 +14,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PATCH;
+import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -29,6 +31,7 @@ public class EventResourceProvider implements EventResource {
 
     public EventResourceProvider(MeetMeThereSession session, EventModel event) {
         this.session = session;
+        if (event == null) throw new NotFoundException("Cannot find event");
         this.event = event;
     }
 
@@ -58,5 +61,10 @@ public class EventResourceProvider implements EventResource {
 
         return Uni.createFrom()
                 .item(toDto(session.events().getEventById(this.event.getId())));
+    }
+
+    @Path("/invitations")
+    public EventInvitationsResource getInvitations() {
+        return new EventInvitationsResourceProvider(session, event);
     }
 }

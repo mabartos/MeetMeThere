@@ -26,6 +26,7 @@ public class UserResourceProvider implements UserResource {
 
     public UserResourceProvider(MeetMeThereSession session, UserModel user) {
         this.session = session;
+        if (user == null) throw new NotFoundException("Cannot find user");
         this.user = user;
     }
 

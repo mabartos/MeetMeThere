@@ -28,7 +28,7 @@ public interface EventsResource {
     Multi<Event> getEvents(@QueryParam(FIRST_RESULT) int firstResult,
                            @QueryParam(MAX_RESULTS) int maxResults);
 
-    @Path("{id}")
+    @Path("/{id}")
     EventResource getEventById(@PathParam(ID) Long id);
 
     @GET

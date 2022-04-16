@@ -1,7 +1,5 @@
 package org.mabartos.meetmethere.model.jpa.provider;
 
-import javax.persistence.EntityManager;
-
 import org.mabartos.meetmethere.model.Coordinates;
 import org.mabartos.meetmethere.model.EventModel;
 import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
@@ -11,11 +9,15 @@ import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.provider.EventProvider;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
+import javax.persistence.EntityManager;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.mabartos.meetmethere.UpdateUtil.update;
+import static org.mabartos.meetmethere.model.jpa.util.JpaUtil.catchNoResult;
 
 public class JpaEventProvider implements EventProvider {
 
@@ -34,31 +36,41 @@ public class JpaEventProvider implements EventProvider {
 
     @Override
     public Set<EventModel> searchByTitle(String title) {
-        final List<EventEntity> events = em.createQuery("select e from EventEntity e where e.title like :title", EventEntity.class)
+        final Optional<List<EventEntity>> events = catchNoResult(() -> em.createQuery("select e from EventEntity e where e.title like :title", EventEntity.class)
                 .setParameter("title", title)
-                .getResultList();
+                .getResultList()
+        );
 
-        return convertToModelSet(events);
+        if (events.isEmpty()) return Collections.emptySet();
+
+        return convertToModelSet(events.get());
     }
 
     @Override
     public Set<EventModel> searchByCoordinates(Coordinates coordinates) {
-        final List<EventEntity> events = em.createQuery("select e from EventEntity e where e.venue.longitude=:longitude and e.venue.latitude =:latitude", EventEntity.class)
-                .setParameter("longitude", coordinates.getLongitude())
-                .setParameter("latitude", coordinates.getLatitude())
-                .getResultList();
+        final Optional<List<EventEntity>> events = catchNoResult(() ->
+                em.createQuery("select e from EventEntity e where e.venue.longitude=:longitude and e.venue.latitude =:latitude", EventEntity.class)
+                        .setParameter("longitude", coordinates.getLongitude())
+                        .setParameter("latitude", coordinates.getLatitude())
+                        .getResultList()
+        );
 
-        return convertToModelSet(events);
+        if (events.isEmpty()) return Collections.emptySet();
+
+        return convertToModelSet(events.get());
     }
 
     @Override
     public Set<EventModel> getEvents(int firstResult, int maxResults) {
-        final List<EventEntity> events = em.createQuery("select e from EventEntity e", EventEntity.class)
+        final Optional<List<EventEntity>> events = catchNoResult(() -> em.createQuery("select e from EventEntity e", EventEntity.class)
                 .setFirstResult(firstResult)
                 .setMaxResults(maxResults)
-                .getResultList();
+                .getResultList()
+        );
 
-        return convertToModelSet(events);
+        if (events.isEmpty()) return Collections.emptySet();
+
+        return convertToModelSet(events.get());
     }
 
     @Override
@@ -96,7 +108,7 @@ public class JpaEventProvider implements EventProvider {
     }
 
     @Override
-    public void updateEvent(EventModel event) {
+    public EventModel updateEvent(EventModel event) {
         EventEntity entity = EventEntity.<EventEntity>findByIdOptional(event.getId())
                 .orElseThrow(() -> new IllegalArgumentException("Cannot update Event"));
 
@@ -104,6 +116,8 @@ public class JpaEventProvider implements EventProvider {
 
         em.merge(entity);
         em.flush();
+
+        return new JpaEventAdapter(session, em, entity);
     }
 
     private Set<EventModel> convertToModelSet(List<EventEntity> entities) {

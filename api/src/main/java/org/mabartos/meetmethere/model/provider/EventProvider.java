@@ -25,5 +25,5 @@ public interface EventProvider {
 
     void removeEvent(Long id) throws ModelNotFoundException;
 
-    void updateEvent(EventModel event);
+    EventModel updateEvent(EventModel event);
 }

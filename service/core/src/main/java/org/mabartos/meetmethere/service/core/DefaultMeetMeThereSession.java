@@ -3,6 +3,7 @@ package org.mabartos.meetmethere.service.core;
 /*import javax.persistence.EntityManager;
 import org.mabartos.meetmethere.model.jpa.provider.JpaEventProvider;*/
 
+import org.mabartos.meetmethere.model.jpa.provider.JpaEventInvitationProviderFactory;
 import org.mabartos.meetmethere.model.jpa.provider.JpaEventProviderFactory;
 import org.mabartos.meetmethere.model.jpa.provider.JpaUserProviderFactory;
 import org.mabartos.meetmethere.model.provider.EventProvider;
@@ -35,7 +36,7 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
 
     @Override
     public InvitationProvider invitations() {
-        return null;
+        return new JpaEventInvitationProviderFactory().create(this);
     }
 
     @Override
