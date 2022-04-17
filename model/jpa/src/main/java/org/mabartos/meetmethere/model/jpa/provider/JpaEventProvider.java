@@ -2,14 +2,19 @@ package org.mabartos.meetmethere.model.jpa.provider;
 
 import org.mabartos.meetmethere.model.Coordinates;
 import org.mabartos.meetmethere.model.EventModel;
+import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaAddressAdapter;
 import org.mabartos.meetmethere.model.jpa.adapter.JpaEventAdapter;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaInvitationAdapter;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaUserAdapter;
 import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.provider.EventProvider;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +24,7 @@ import java.util.stream.Collectors;
 import static org.mabartos.meetmethere.UpdateUtil.update;
 import static org.mabartos.meetmethere.model.jpa.util.JpaUtil.catchNoResult;
 
+@Transactional
 public class JpaEventProvider implements EventProvider {
 
     private final MeetMeThereSession session;
@@ -31,7 +37,7 @@ public class JpaEventProvider implements EventProvider {
 
     @Override
     public EventModel getEventById(Long id) {
-        return EventEntity.findById(id);
+        return new JpaEventAdapter(session, em, EventEntity.findById(id));
     }
 
     @Override
@@ -80,7 +86,7 @@ public class JpaEventProvider implements EventProvider {
 
     @Override
     public EventModel createEvent(EventModel event) throws ModelDuplicateException {
-        if (EventEntity.findByIdOptional(event.getId()).isPresent()) {
+        if (JpaEventAdapter.convertToEntity(event, em) != null) {
             throw new ModelDuplicateException("Duplicate event");
         }
 
@@ -92,9 +98,10 @@ public class JpaEventProvider implements EventProvider {
     }
 
     @Override
-    public EventModel createEvent(String title) {
+    public EventModel createEvent(String title, UserModel creator) {
         EventEntity entity = new EventEntity();
         entity.setTitle(title);
+        entity.setCreator(JpaUserAdapter.convertToEntity(creator, em));
 
         em.persist(entity);
         em.flush();
@@ -109,7 +116,7 @@ public class JpaEventProvider implements EventProvider {
 
     @Override
     public EventModel updateEvent(EventModel event) {
-        EventEntity entity = EventEntity.<EventEntity>findByIdOptional(event.getId())
+        EventEntity entity = Optional.ofNullable(JpaEventAdapter.convertToEntity(event, em))
                 .orElseThrow(() -> new IllegalArgumentException("Cannot update Event"));
 
         convertEvent(entity, event);
@@ -124,7 +131,7 @@ public class JpaEventProvider implements EventProvider {
         return entities.stream().map(f -> new JpaEventAdapter(session, em, f)).collect(Collectors.toSet());
     }
 
-    public static void convertEvent(EventEntity entity, EventModel model) {
+    public void convertEvent(EventEntity entity, EventModel model) {
         update(entity::setTitle, model::getEventTitle);
         update(entity::setDescription, model::getDescription);
         update(entity::setPublic, model::isPublic);
@@ -134,14 +141,16 @@ public class JpaEventProvider implements EventProvider {
         update(entity::setEndTime, model::getEndTime);
         update(entity::setAttributes, model::getAttributes);
 
-        //TODO
-        /*update(entity::setInvitations, model::getAttributes);
-        update(entity::setVenue, model::getVenue);
-        update(entity::setUpdatedBy, model::getUpdatedBy);
-        update(entity::setCreator, model::getCreatedBy);*/
+        update(entity::setCreator, () -> JpaUserAdapter.convertToEntity(model.getCreatedBy(), em));
+        update(entity::setUpdatedBy, () -> JpaUserAdapter.convertToEntity(model.getUpdatedBy(), em));
+        update(entity::setVenue, () -> JpaAddressAdapter.convertToEntity(model.getVenue()));
+        update(entity::setInvitations, () -> model.getInvitations()
+                .stream()
+                .map(f -> JpaInvitationAdapter.convertToEntity(f, em))
+                .collect(Collectors.toSet()));
     }
 
-    private static EventEntity convertEntity(EventModel model) {
+    private EventEntity convertEntity(EventModel model) {
         EventEntity entity = new EventEntity();
         convertEvent(entity, model);
         return entity;

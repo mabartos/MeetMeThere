@@ -3,12 +3,14 @@ package org.mabartos.meetmethere.model.jpa.provider;
 import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaEventAdapter;
 import org.mabartos.meetmethere.model.jpa.adapter.JpaUserAdapter;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.model.provider.UserProvider;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -19,6 +21,7 @@ import java.util.stream.Collectors;
 import static org.mabartos.meetmethere.UpdateUtil.update;
 import static org.mabartos.meetmethere.model.jpa.util.JpaUtil.catchNoResult;
 
+@Transactional
 public class JpaUserProvider implements UserProvider {
     private final MeetMeThereSession session;
     private final EntityManager em;
@@ -30,7 +33,7 @@ public class JpaUserProvider implements UserProvider {
 
     @Override
     public UserModel getUserById(Long id) {
-        return new JpaUserAdapter(session, em, em.find(UserEntity.class, id));
+        return new JpaUserAdapter(session, em, UserEntity.findById(id));
     }
 
     @Override
@@ -96,7 +99,7 @@ public class JpaUserProvider implements UserProvider {
 
     @Override
     public UserModel createUser(UserModel user) throws ModelDuplicateException {
-        if (UserEntity.findByIdOptional(user.getId()).isPresent()) {
+        if (JpaUserAdapter.convertToEntity(user, em) != null) {
             throw new ModelDuplicateException("Duplicate user");
         }
 
@@ -114,7 +117,7 @@ public class JpaUserProvider implements UserProvider {
 
     @Override
     public UserModel updateUser(UserModel user) {
-        UserEntity entity = UserEntity.<UserEntity>findByIdOptional(user.getId())
+        UserEntity entity = Optional.ofNullable(JpaUserAdapter.convertToEntity(user, em))
                 .orElseThrow(() -> new IllegalArgumentException("Cannot update User"));
 
         convertUser(entity, user);
@@ -125,15 +128,20 @@ public class JpaUserProvider implements UserProvider {
         return new JpaUserAdapter(session, em, entity);
     }
 
-    private static void convertUser(UserEntity entity, UserModel model) {
+    private void convertUser(UserEntity entity, UserModel model) {
         update(entity::setEmail, model::getEmail);
         update(entity::setUsername, model::getUsername);
         update(entity::setFirstName, model::getFirstName);
         update(entity::setLastName, model::getLastName);
         update(entity::setAttributes, model::getAttributes);
+        update(entity::setOrganizedEvents, () -> model.getOrganizedEvents()
+                .stream()
+                .map(f -> JpaEventAdapter.convertToEntity(f, em))
+                .collect(Collectors.toSet())
+        );
     }
 
-    private static UserEntity convertEntity(UserModel model) {
+    private UserEntity convertEntity(UserModel model) {
         UserEntity entity = new UserEntity();
         convertUser(entity, model);
         return entity;

@@ -5,7 +5,9 @@ import org.mabartos.meetmethere.model.InvitationModel;
 import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaEventAdapter;
 import org.mabartos.meetmethere.model.jpa.adapter.JpaInvitationAdapter;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaUserAdapter;
 import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.jpa.entity.InvitationEntity;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
@@ -13,12 +15,15 @@ import org.mabartos.meetmethere.model.provider.InvitationProvider;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
 import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.mabartos.meetmethere.UpdateUtil.update;
 
+@Transactional
 public class JpaEventInvitationProvider implements InvitationProvider {
     private final MeetMeThereSession session;
     private final EntityManager em;
@@ -30,7 +35,7 @@ public class JpaEventInvitationProvider implements InvitationProvider {
 
     @Override
     public InvitationModel getInvitationById(Long id) {
-        return InvitationEntity.findById(id);
+        return new JpaInvitationAdapter(session, em, InvitationEntity.findById(id));
     }
 
     @Override
@@ -47,7 +52,7 @@ public class JpaEventInvitationProvider implements InvitationProvider {
 
     @Override
     public InvitationModel createInvitation(InvitationModel invitation) throws ModelDuplicateException {
-        if (InvitationEntity.<InvitationEntity>findByIdOptional(invitation.getId()).isPresent()) {
+        if (JpaInvitationAdapter.convertToEntity(invitation, em) != null) {
             throw new ModelDuplicateException("Duplicate Event invitation");
         }
 
@@ -106,7 +111,7 @@ public class JpaEventInvitationProvider implements InvitationProvider {
 
     @Override
     public InvitationModel updateInvitation(InvitationModel invitation) {
-        InvitationEntity entity = InvitationEntity.<InvitationEntity>findByIdOptional(invitation.getId())
+        InvitationEntity entity = Optional.ofNullable(JpaInvitationAdapter.convertToEntity(invitation, em))
                 .orElseThrow(() -> new IllegalArgumentException("Cannot update Event invitation"));
 
         convertInvitation(entity, invitation);
@@ -117,9 +122,9 @@ public class JpaEventInvitationProvider implements InvitationProvider {
     }
 
     public void convertInvitation(InvitationEntity entity, InvitationModel model) {
-        update(entity::setEvent, () -> em.find(EventEntity.class, model.getEvent().getId()));
-        update(entity::setSender, () -> em.find(UserEntity.class, model.getSender().getId()));
-        update(entity::setReceiver, () -> em.find(UserEntity.class, model.getReceiver().getId()));
+        update(entity::setEvent, () -> JpaEventAdapter.convertToEntity(model.getEvent(), em));
+        update(entity::setSender, () -> JpaUserAdapter.convertToEntity(model.getSender(), em));
+        update(entity::setReceiver, () -> JpaUserAdapter.convertToEntity(model.getReceiver(), em));
         convertInvitationStaticAttributes(entity, model);
     }
 

@@ -1,16 +1,17 @@
 package org.mabartos.meetmethere.model.jpa.adapter;
 
-import javax.persistence.EntityManager;
+import io.smallrye.common.constraint.NotNull;
 import org.mabartos.meetmethere.model.EventModel;
 import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.jpa.JpaModel;
 import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
+import org.mabartos.meetmethere.model.jpa.util.JpaUtil;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
+import javax.persistence.EntityManager;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,7 +20,9 @@ public class JpaUserAdapter implements UserModel, JpaModel<UserEntity> {
     private final EntityManager em;
     private final UserEntity entity;
 
-    public JpaUserAdapter(MeetMeThereSession session, EntityManager em, UserEntity entity) {
+    public JpaUserAdapter(MeetMeThereSession session,
+                          @NotNull EntityManager em,
+                          @NotNull UserEntity entity) {
         this.session = session;
         this.em = em;
         this.entity = entity;
@@ -88,10 +91,7 @@ public class JpaUserAdapter implements UserModel, JpaModel<UserEntity> {
     public void setOrganizedEvents(Set<EventModel> events) {
         final Set<EventEntity> entities = events.stream()
                 .filter(Objects::nonNull)
-                .map(f -> EventEntity.findByIdOptional(f.getId()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(f -> (EventEntity) f)
+                .map(f -> JpaEventAdapter.convertToEntity(f, em))
                 .collect(Collectors.toSet());
 
         getEntity().setOrganizedEvents(entities);
@@ -104,21 +104,38 @@ public class JpaUserAdapter implements UserModel, JpaModel<UserEntity> {
 
     @Override
     public void setAttribute(String key, String value) {
-
+        getEntity().getAttributes().put(key, value);
     }
 
     @Override
     public void removeAttribute(String name) {
-
+        getEntity().getAttributes().remove(name);
     }
 
     @Override
     public Map<String, String> getAttributes() {
-        return null;
+        return getEntity().getAttributes();
     }
 
     @Override
     public void setAttributes(Map<String, String> attributes) {
+        getEntity().setAttributes(attributes);
+    }
 
+    public static UserEntity convertToEntity(UserModel userModel, EntityManager em) {
+        return JpaUtil.convertToEntity(userModel, em, JpaUserAdapter.class, UserEntity.class);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JpaUserAdapter)) return false;
+        JpaUserAdapter that = (JpaUserAdapter) o;
+        return Objects.equals(getEntity(), that.getEntity());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getEntity());
     }
 }

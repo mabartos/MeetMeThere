@@ -8,6 +8,7 @@ import org.mabartos.meetmethere.interaction.rest.api.EventResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventsResource;
 import org.mabartos.meetmethere.model.Coordinates;
 import org.mabartos.meetmethere.model.EventModel;
+import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
 import javax.enterprise.context.RequestScoped;
@@ -15,7 +16,6 @@ import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -88,15 +88,16 @@ public class EventsResourceProvider implements EventsResource {
 
     @POST
     public Uni<Event> createEvent(Event event) {
-        if (session.events().getEventById(event.getId()) != null) {
-            throw new BadRequestException("Event already exists.");
+        if (event.getId() != null && session.events().getEventById(event.getId()) != null) {
+            throw new BadRequestException("Event already exists with the id.");
         }
 
-        EventModel model = session.events().createEvent(event.getTitle());
+        final UserModel creator = session.users().getUserById(event.getCreatedById());
+
+        EventModel model = session.events().createEvent(event.getTitle(), creator);
         updateModel(event, model);
 
-        session.events().updateEvent(model);
-        return Uni.createFrom().item(toDto(session.events().getEventById(model.getId())));
+        return Uni.createFrom().item(toDto(session.events().updateEvent(model)));
     }
 
     @GET

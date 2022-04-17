@@ -1,5 +1,6 @@
 package org.mabartos.meetmethere.model.jpa.adapter;
 
+import io.smallrye.common.constraint.NotNull;
 import org.mabartos.meetmethere.enums.ResponseType;
 import org.mabartos.meetmethere.model.AddressModel;
 import org.mabartos.meetmethere.model.EventModel;
@@ -8,6 +9,7 @@ import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.jpa.JpaModel;
 import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
+import org.mabartos.meetmethere.model.jpa.util.JpaUtil;
 import org.mabartos.meetmethere.session.MeetMeThereSession;
 
 import javax.persistence.EntityManager;
@@ -15,7 +17,6 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,7 +25,9 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
     private final EntityManager em;
     private final EventEntity entity;
 
-    public JpaEventAdapter(MeetMeThereSession session, EntityManager em, EventEntity entity) {
+    public JpaEventAdapter(MeetMeThereSession session,
+                           @NotNull EntityManager em,
+                           @NotNull EventEntity entity) {
         this.session = session;
         this.em = em;
         this.entity = entity;
@@ -66,6 +69,11 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
     }
 
     @Override
+    public void setCreatedBy(UserModel user) {
+        getEntity().setCreator(JpaUserAdapter.convertToEntity(user, em));
+    }
+
+    @Override
     public LocalDateTime getCreatedAt() {
         return getEntity().getCreatedAt();
     }
@@ -92,10 +100,7 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
     public void setOrganizers(Set<UserModel> organizers) {
         Set<UserEntity> entities = organizers.stream()
                 .filter(Objects::nonNull)
-                .map(f -> UserEntity.findByIdOptional(f.getId()))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(f -> (UserEntity) f)
+                .map(f -> JpaUserAdapter.convertToEntity(f, em))
                 .collect(Collectors.toSet());
 
         getEntity().setOrganizers(entities);
@@ -128,7 +133,7 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
 
     @Override
     public void setVenue(AddressModel venue) {
-        getEntity().setVenue(JpaAddressAdapter.toEntity(venue));
+        getEntity().setVenue(JpaAddressAdapter.convertToEntity(venue));
     }
 
     @Override
@@ -144,6 +149,11 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
     @Override
     public UserModel getUpdatedBy() {
         return new JpaUserAdapter(session, em, getEntity().getUpdatedBy());
+    }
+
+    @Override
+    public void setUpdatedBy(UserModel user) {
+        getEntity().setUpdatedBy(JpaUserAdapter.convertToEntity(user, em));
     }
 
     @Override
@@ -187,5 +197,22 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
     @Override
     public void setAttributes(Map<String, String> attributes) {
         getEntity().setAttributes(attributes);
+    }
+
+    public static EventEntity convertToEntity(EventModel model, EntityManager em) {
+        return JpaUtil.convertToEntity(model, em, JpaEventAdapter.class, EventEntity.class);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof JpaEventAdapter)) return false;
+        JpaEventAdapter that = (JpaEventAdapter) o;
+        return Objects.equals(getEntity(), that.getEntity());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getEntity());
     }
 }

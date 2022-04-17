@@ -29,13 +29,14 @@ public class ModelToDto {
     }
 
     public static Event toDto(EventModel model) {
-        Event event = new Event(model.getEventTitle(), toDto(model.getCreatedBy()), model.getCreatedAt());
+        Event event = new Event(model.getEventTitle(), toDto(model.getCreatedBy()));
         update(event::setId, model::getId);
         update(event::setDescription, model::getDescription);
         update(event::setPublic, model::isPublic);
         update(event::setVenue, () -> toDto(model.getVenue()));
 
         update(event::setUpdatedAt, model::getUpdatedAt);
+        update(event::setCreatedAt, model::getCreatedAt);
         final UserModel updatedBy = model.getUpdatedBy();
         update(event::setUpdatedById, updatedBy::getId);
         update(event::setUpdatedByName, () -> String.format("%s %s", updatedBy.getFirstName(), updatedBy.getLastName()));
@@ -66,6 +67,7 @@ public class ModelToDto {
 
     public static EventInvitation toDto(InvitationModel model) {
         EventInvitation eventInvitation = new EventInvitation(toDto(model.getEvent()), toDto(model.getSender()), toDto(model.getReceiver()));
+        update(eventInvitation::setId, model::getId);
         update(eventInvitation::setResponseType, model::getResponseType);
         update(eventInvitation::setMessage, model::getMessage);
         return eventInvitation;

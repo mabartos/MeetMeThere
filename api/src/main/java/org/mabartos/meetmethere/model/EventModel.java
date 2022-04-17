@@ -10,6 +10,8 @@ public interface EventModel extends HasId<Long>, HasAttributes<String, String> {
 
     UserModel getCreatedBy();
 
+    void setCreatedBy(UserModel user);
+
     LocalDateTime getCreatedAt();
 
     boolean isPublic();
@@ -45,6 +47,8 @@ public interface EventModel extends HasId<Long>, HasAttributes<String, String> {
     void setUpdatedAt(LocalDateTime updatedAt);
 
     UserModel getUpdatedBy();
+
+    void setUpdatedBy(UserModel user);
 
     Map<UserModel, ResponseType> getResponses();
 

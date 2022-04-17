@@ -2,6 +2,7 @@ package org.mabartos.meetmethere.model.provider;
 
 import org.mabartos.meetmethere.model.Coordinates;
 import org.mabartos.meetmethere.model.EventModel;
+import org.mabartos.meetmethere.model.UserModel;
 import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
 
@@ -21,7 +22,7 @@ public interface EventProvider {
 
     EventModel createEvent(EventModel event) throws ModelDuplicateException;
 
-    EventModel createEvent(String title);
+    EventModel createEvent(String title, UserModel creator);
 
     void removeEvent(Long id) throws ModelNotFoundException;
 

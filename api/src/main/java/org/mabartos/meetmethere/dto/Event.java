@@ -1,5 +1,6 @@
 package org.mabartos.meetmethere.dto;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -46,11 +47,15 @@ public class Event implements Serializable {
 
     private Map<String, String> attributes;
 
-    public Event(String title, User createdBy, LocalDateTime createdAt) {
+    @JsonCreator
+    public Event() {
+
+    }
+
+    public Event(String title, User createdBy) {
         this.title = title;
         this.createdByName = String.format("%s %s", createdBy.getFirstName(), createdBy.getLastName());
         this.createdById = createdBy.getId();
-        this.createdAt = createdAt;
         this.organizersId = new HashSet<>();
         this.attributes = new HashMap<>();
         this.invitationsId = new HashSet<>();

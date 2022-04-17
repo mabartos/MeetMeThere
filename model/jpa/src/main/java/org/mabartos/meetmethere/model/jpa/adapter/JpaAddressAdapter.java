@@ -1,5 +1,6 @@
 package org.mabartos.meetmethere.model.jpa.adapter;
 
+import io.smallrye.common.constraint.NotNull;
 import org.mabartos.meetmethere.model.AddressModel;
 import org.mabartos.meetmethere.model.Coordinates;
 import org.mabartos.meetmethere.model.jpa.entity.AddressEntity;
@@ -9,7 +10,7 @@ import static org.mabartos.meetmethere.UpdateUtil.update;
 public class JpaAddressAdapter implements AddressModel {
     private final AddressEntity entity;
 
-    public JpaAddressAdapter(AddressEntity entity) {
+    public JpaAddressAdapter(@NotNull AddressEntity entity) {
         this.entity = entity;
     }
 
@@ -55,7 +56,7 @@ public class JpaAddressAdapter implements AddressModel {
 
     @Override
     public String getStreetNumber() {
-        return getStreetNumber();
+        return entity.getStreetNumber();
     }
 
     @Override
@@ -74,7 +75,9 @@ public class JpaAddressAdapter implements AddressModel {
         entity.setLatitude(coordinates.getLatitude());
     }
 
-    public static AddressEntity toEntity(AddressModel model) {
+    public static AddressEntity convertToEntity(AddressModel model) {
+        if (model == null) return null;
+
         AddressEntity entity = new AddressEntity();
         update(entity::setCountry, model::getCountry);
         update(entity::setCity, model::getCity);
@@ -87,5 +90,4 @@ public class JpaAddressAdapter implements AddressModel {
         update(entity::setLatitude, coordinates::getLatitude);
         return entity;
     }
-
 }

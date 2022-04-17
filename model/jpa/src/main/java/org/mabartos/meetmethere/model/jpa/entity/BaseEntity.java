@@ -13,7 +13,7 @@ import java.util.Objects;
 
 @MappedSuperclass
 @NoArgsConstructor
-public abstract class BaseEntity extends PanacheEntityBase {
+public class BaseEntity extends PanacheEntityBase {
 
     @Id
     @GeneratedValue
