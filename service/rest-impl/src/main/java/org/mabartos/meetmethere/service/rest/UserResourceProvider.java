@@ -1,7 +1,6 @@
 package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
@@ -16,7 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static org.mabartos.meetmethere.interaction.rest.api.model.JsonToModel.updateModel;
+import static org.mabartos.meetmethere.api.model.ModelUpdater.updateModel;
 import static org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson.toJson;
 
 @Consumes(MediaType.APPLICATION_JSON)

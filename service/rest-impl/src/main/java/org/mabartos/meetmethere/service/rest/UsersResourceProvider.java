@@ -2,7 +2,6 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
@@ -28,7 +27,7 @@ import javax.ws.rs.core.MediaType;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;
-import static org.mabartos.meetmethere.interaction.rest.api.model.JsonToModel.updateModel;
+import static org.mabartos.meetmethere.api.model.ModelUpdater.updateModel;
 
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -72,7 +71,7 @@ public class UsersResourceProvider implements UsersResource {
                         .distinct()
                         .toArray())
                 .onItem()
-                .castTo(User.class);
+                .castTo(UserJson.class);
     }
 
     @GET

@@ -1,72 +1,60 @@
 package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.api.domain.Event;
+import org.mabartos.meetmethere.api.service.EventService;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationsResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventResource;
-import org.mabartos.meetmethere.api.model.EventModel;
-import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
-import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
-import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
 
 import javax.transaction.Transactional;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.PATCH;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static org.mabartos.meetmethere.interaction.rest.api.model.JsonToModel.updateModel;
-import static org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson.toJson;
+import static org.mabartos.meetmethere.service.rest.EventsResourceProvider.getSingleEvent;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
 public class EventResourceProvider implements EventResource {
     private final MeetMeThereSession session;
-    private final EventModel event;
+    private final Long eventId;
 
-    public EventResourceProvider(MeetMeThereSession session, EventModel event) {
+    public EventResourceProvider(MeetMeThereSession session, Long id) {
         this.session = session;
-        if (event == null) throw new NotFoundException("Cannot find event");
-        this.event = event;
+        this.eventId = id;
     }
 
     @GET
     public Uni<EventJson> getEvent() {
-        return Uni.createFrom().item(ModelToJson.toJson(event));
+        return getSingleEvent(session.eventBus(), EventService.EVENT_GET_EVENT_EVENT, eventId);
     }
 
     @DELETE
     public Response removeEvent() {
-        try {
-            session.events().removeEvent(event.getId());
-            return Response.noContent().build();
-        } catch (ModelNotFoundException e) {
-            throw new NotFoundException("Cannot remove event. Event doesn't exist.");
-        }
+        session.eventBus().publish(EventService.EVENT_REMOVE_EVENT, eventId);
+        return Response.ok().build();
     }
 
     @PATCH
     public Uni<EventJson> updateEvent(EventJson event) {
-        try {
-            updateModel(event, this.event);
-            session.events().updateEvent(this.event);
-        } catch (IllegalArgumentException e) {
-            throw new NotFoundException("Cannot update event. Event doesn't exist.");
+        if (event.getId() != null && !eventId.equals(event.getId())) {
+            throw new BadRequestException("Cannot update Event - different IDs");
         }
+        event.setId(eventId);
 
-        return Uni.createFrom()
-                .item(ModelToJson.toJson(session.events().getEventById(this.event.getId())));
+        return getSingleEvent(session.eventBus(), EventService.EVENT_UPDATE_EVENT, event);
     }
 
     @Path("/invitations")
     public EventInvitationsResource getInvitations() {
-        return new EventInvitationsResourceProvider(session, event);
+        return new EventInvitationsResourceProvider(session, eventId);
     }
 }

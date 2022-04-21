@@ -1,9 +1,5 @@
 package org.mabartos.meetmethere.interaction.rest.api.model;
 
-import org.mabartos.meetmethere.api.domain.Address;
-import org.mabartos.meetmethere.api.domain.Event;
-import org.mabartos.meetmethere.api.domain.EventInvitation;
-import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.api.model.AddressModel;
 import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.EventModel;
@@ -17,8 +13,8 @@ import static org.mabartos.meetmethere.api.UpdateUtil.update;
 
 public class ModelToJson {
 
-    public static User toJson(UserModel model) {
-        User user = new User(model.getUsername(), model.getEmail());
+    public static UserJson toJson(UserModel model) {
+        UserJson user = new UserJson(model.getUsername(), model.getEmail());
         update(user::setId, model::getId);
         update(user::setFirstName, model::getFirstName);
         update(user::setLastName, model::getLastName);
@@ -28,8 +24,8 @@ public class ModelToJson {
         return user;
     }
 
-    public static Event toJson(EventModel model) {
-        Event event = new Event(model.getEventTitle(), toJson(model.getCreatedBy()));
+    public static EventJson toJson(EventModel model) {
+        EventJson event = new EventJson(model.getEventTitle(), toJson(model.getCreatedBy()));
         update(event::setId, model::getId);
         update(event::setDescription, model::getDescription);
         update(event::setPublic, model::isPublic);
@@ -52,8 +48,8 @@ public class ModelToJson {
         return event;
     }
 
-    public static Address toJson(AddressModel model) {
-        Address address = new Address(model.getCountry());
+    public static AddressJson toJson(AddressModel model) {
+        AddressJson address = new AddressJson(model.getCountry());
         update(address::setCity, model::getCity);
         update(address::setZipCode, model::getZipCode);
         update(address::setStreet, model::getStreet);
@@ -65,8 +61,8 @@ public class ModelToJson {
         return address;
     }
 
-    public static EventInvitation toJson(InvitationModel model) {
-        EventInvitation eventInvitation = new EventInvitation(toJson(model.getEvent()), toJson(model.getSender()), toJson(model.getReceiver()));
+    public static EventInvitationJson toJson(InvitationModel model) {
+        EventInvitationJson eventInvitation = new EventInvitationJson(toJson(model.getEvent()), toJson(model.getSender()), toJson(model.getReceiver()));
         update(eventInvitation::setId, model::getId);
         update(eventInvitation::setResponseType, model::getResponseType);
         update(eventInvitation::setMessage, model::getMessage);

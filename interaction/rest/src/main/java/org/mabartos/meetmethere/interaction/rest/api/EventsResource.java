@@ -1,8 +1,6 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.api.domain.Event;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
 
 import javax.transaction.Transactional;
@@ -14,6 +12,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.Set;
 
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
@@ -26,20 +25,20 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 public interface EventsResource {
 
     @GET
-    Multi<EventJson> getEvents(@QueryParam(FIRST_RESULT) int firstResult,
-                               @QueryParam(MAX_RESULTS) int maxResults);
+    Uni<Set<EventJson>> getEvents(@QueryParam(FIRST_RESULT) int firstResult,
+                                  @QueryParam(MAX_RESULTS) int maxResults);
 
     @Path("/{id}")
     EventResource getEventById(@PathParam(ID) Long id);
 
     @GET
     @Path("/{title}")
-    Multi<EventJson> searchEventsByTitle(@PathParam("title") String title);
+    Uni<Set<EventJson>> searchEventsByTitle(@PathParam("title") String title);
 
     @GET
     @Path("/coordinates")
-    Multi<EventJson> searchEventsByCoordinates(@QueryParam("longitude") Double longitude,
-                                           @QueryParam("latitude") Double latitude);
+    Uni<Set<EventJson>> searchEventsByCoordinates(@QueryParam("longitude") Double longitude,
+                                                  @QueryParam("latitude") Double latitude);
 
     @POST
     Uni<EventJson> createEvent(EventJson event);

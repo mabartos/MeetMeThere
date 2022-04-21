@@ -1,15 +1,12 @@
-package org.mabartos.meetmethere.interaction.rest.api.model;
+package org.mabartos.meetmethere.api.model;
 
 import org.mabartos.meetmethere.api.domain.Event;
 import org.mabartos.meetmethere.api.domain.EventInvitation;
 import org.mabartos.meetmethere.api.domain.User;
-import org.mabartos.meetmethere.api.model.EventModel;
-import org.mabartos.meetmethere.api.model.InvitationModel;
-import org.mabartos.meetmethere.api.model.UserModel;
 
 import static org.mabartos.meetmethere.api.UpdateUtil.update;
 
-public class JsonToModel {
+public class ModelUpdater {
 
     public static void updateModel(User user, UserModel model) {
         update(model::setUsername, user::getUsername);
