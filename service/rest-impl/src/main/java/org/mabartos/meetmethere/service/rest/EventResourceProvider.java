@@ -1,12 +1,14 @@
 package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.dto.Event;
+import org.mabartos.meetmethere.api.domain.Event;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationsResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventResource;
-import org.mabartos.meetmethere.model.EventModel;
-import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
-import org.mabartos.meetmethere.session.MeetMeThereSession;
+import org.mabartos.meetmethere.api.model.EventModel;
+import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
+import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
+import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -19,8 +21,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static org.mabartos.meetmethere.DtoToModel.updateModel;
-import static org.mabartos.meetmethere.ModelToDto.toDto;
+import static org.mabartos.meetmethere.interaction.rest.api.model.JsonToModel.updateModel;
+import static org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson.toJson;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -36,8 +38,8 @@ public class EventResourceProvider implements EventResource {
     }
 
     @GET
-    public Uni<Event> getEvent() {
-        return Uni.createFrom().item(toDto(event));
+    public Uni<EventJson> getEvent() {
+        return Uni.createFrom().item(ModelToJson.toJson(event));
     }
 
     @DELETE
@@ -51,7 +53,7 @@ public class EventResourceProvider implements EventResource {
     }
 
     @PATCH
-    public Uni<Event> updateEvent(Event event) {
+    public Uni<EventJson> updateEvent(EventJson event) {
         try {
             updateModel(event, this.event);
             session.events().updateEvent(this.event);
@@ -60,7 +62,7 @@ public class EventResourceProvider implements EventResource {
         }
 
         return Uni.createFrom()
-                .item(toDto(session.events().getEventById(this.event.getId())));
+                .item(ModelToJson.toJson(session.events().getEventById(this.event.getId())));
     }
 
     @Path("/invitations")

@@ -1,7 +1,8 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.dto.User;
+import org.mabartos.meetmethere.api.domain.User;
+import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -18,11 +19,11 @@ import javax.ws.rs.core.Response;
 public interface UserResource {
 
     @GET
-    Uni<User> getUser();
+    Uni<UserJson> getUser();
 
     @DELETE
     Response removeUser();
 
     @PATCH
-    Uni<User> updateUser(User user);
+    Uni<UserJson> updateUser(UserJson user);
 }

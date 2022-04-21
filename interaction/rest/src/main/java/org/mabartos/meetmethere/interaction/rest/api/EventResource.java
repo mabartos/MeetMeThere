@@ -1,7 +1,8 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.dto.Event;
+import org.mabartos.meetmethere.api.domain.Event;
+import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -19,13 +20,13 @@ import javax.ws.rs.core.Response;
 public interface EventResource {
 
     @GET
-    Uni<Event> getEvent();
+    Uni<EventJson> getEvent();
 
     @DELETE
     Response removeEvent();
 
     @PATCH
-    Uni<Event> updateEvent(Event event);
+    Uni<EventJson> updateEvent(EventJson event);
 
     @Path("/invitations")
     EventInvitationsResource getInvitations();

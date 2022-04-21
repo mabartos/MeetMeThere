@@ -1,15 +1,15 @@
 package org.mabartos.meetmethere.service.core;
 
 /*import javax.persistence.EntityManager;
-import org.mabartos.meetmethere.model.jpa.provider.JpaEventProvider;*/
+import org.mabartos.meetmethere.api.model.jpa.provider.JpaEventProvider;*/
 
-import org.mabartos.meetmethere.model.jpa.provider.JpaEventInvitationProviderFactory;
-import org.mabartos.meetmethere.model.jpa.provider.JpaEventProviderFactory;
-import org.mabartos.meetmethere.model.jpa.provider.JpaUserProviderFactory;
-import org.mabartos.meetmethere.model.provider.EventProvider;
-import org.mabartos.meetmethere.model.provider.InvitationProvider;
-import org.mabartos.meetmethere.model.provider.UserProvider;
-import org.mabartos.meetmethere.session.MeetMeThereSession;
+import org.mabartos.meetmethere.api.model.jpa.provider.JpaEventInvitationProviderFactory;
+import org.mabartos.meetmethere.api.model.jpa.provider.JpaEventProviderFactory;
+import org.mabartos.meetmethere.api.model.jpa.provider.JpaUserProviderFactory;
+import org.mabartos.meetmethere.api.provider.EventProvider;
+import org.mabartos.meetmethere.api.provider.InvitationProvider;
+import org.mabartos.meetmethere.api.provider.UserProvider;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;

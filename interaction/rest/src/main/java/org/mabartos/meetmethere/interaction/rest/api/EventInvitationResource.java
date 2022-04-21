@@ -1,7 +1,8 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.dto.EventInvitation;
+import org.mabartos.meetmethere.api.domain.EventInvitation;
+import org.mabartos.meetmethere.interaction.rest.api.model.EventInvitationJson;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -19,23 +20,23 @@ import javax.ws.rs.core.Response;
 public interface EventInvitationResource {
 
     @GET
-    Uni<EventInvitation> getInvitation();
+    Uni<EventInvitationJson> getInvitation();
 
     @GET
     @Path("/accept")
-    Uni<EventInvitation> acceptInvitation();
+    Uni<EventInvitationJson> acceptInvitation();
 
     @GET
     @Path("/decline")
-    Uni<EventInvitation> declineInvitation();
+    Uni<EventInvitationJson> declineInvitation();
 
     @GET
     @Path("/maybe")
-    Uni<EventInvitation> addMaybeStatus();
+    Uni<EventInvitationJson> addMaybeStatus();
 
     @DELETE
     Response removeInvitation();
 
     @PATCH
-    Uni<EventInvitation> updateInvitation(EventInvitation invitation);
+    Uni<EventInvitationJson> updateInvitation(EventInvitationJson invitation);
 }

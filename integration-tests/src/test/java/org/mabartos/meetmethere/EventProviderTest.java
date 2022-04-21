@@ -4,11 +4,11 @@ import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.mabartos.meetmethere.model.EventModel;
-import org.mabartos.meetmethere.model.UserModel;
-import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
-import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
-import org.mabartos.meetmethere.session.MeetMeThereSession;
+import org.mabartos.meetmethere.api.model.EventModel;
+import org.mabartos.meetmethere.api.model.UserModel;
+import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
+import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.inject.Inject;
 import java.time.LocalDateTime;

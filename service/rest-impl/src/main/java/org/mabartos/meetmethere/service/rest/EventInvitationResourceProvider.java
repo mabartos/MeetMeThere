@@ -1,12 +1,13 @@
 package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.dto.EventInvitation;
-import org.mabartos.meetmethere.enums.ResponseType;
+import org.mabartos.meetmethere.api.domain.EventInvitation;
+import org.mabartos.meetmethere.api.enums.ResponseType;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationResource;
-import org.mabartos.meetmethere.model.InvitationModel;
-import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
-import org.mabartos.meetmethere.session.MeetMeThereSession;
+import org.mabartos.meetmethere.api.model.InvitationModel;
+import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
+import org.mabartos.meetmethere.interaction.rest.api.model.EventInvitationJson;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -19,8 +20,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static org.mabartos.meetmethere.DtoToModel.updateModel;
-import static org.mabartos.meetmethere.ModelToDto.toDto;
+import static org.mabartos.meetmethere.interaction.rest.api.model.JsonToModel.updateModel;
+import static org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson.toJson;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -36,25 +37,25 @@ public class EventInvitationResourceProvider implements EventInvitationResource 
     }
 
     @GET
-    public Uni<EventInvitation> getInvitation() {
-        return Uni.createFrom().item(toDto(invitation));
+    public Uni<EventInvitationJson> getInvitation() {
+        return Uni.createFrom().item(toJson(invitation));
     }
 
     @GET
     @Path("/accept")
-    public Uni<EventInvitation> acceptInvitation() {
+    public Uni<EventInvitationJson> acceptInvitation() {
         return updateStatus(ResponseType.ACCEPTED);
     }
 
     @GET
     @Path("/decline")
-    public Uni<EventInvitation> declineInvitation() {
+    public Uni<EventInvitationJson> declineInvitation() {
         return updateStatus(ResponseType.DECLINED);
     }
 
     @GET
     @Path("/maybe")
-    public Uni<EventInvitation> addMaybeStatus() {
+    public Uni<EventInvitationJson> addMaybeStatus() {
         return updateStatus(ResponseType.MAYBE);
     }
 
@@ -69,15 +70,15 @@ public class EventInvitationResourceProvider implements EventInvitationResource 
     }
 
     @PATCH
-    public Uni<EventInvitation> updateInvitation(EventInvitation invitation) {
+    public Uni<EventInvitationJson> updateInvitation(EventInvitationJson invitation) {
         updateModel(invitation, this.invitation);
-        return Uni.createFrom().item(toDto(session.invitations().updateInvitation(this.invitation)));
+        return Uni.createFrom().item(toJson(session.invitations().updateInvitation(this.invitation)));
     }
 
-    private Uni<EventInvitation> updateStatus(ResponseType status) {
+    private Uni<EventInvitationJson> updateStatus(ResponseType status) {
         invitation.setResponseType(status);
         InvitationModel updated = session.invitations().updateInvitation(invitation);
 
-        return Uni.createFrom().item(toDto(updated));
+        return Uni.createFrom().item(toJson(updated));
     }
 }

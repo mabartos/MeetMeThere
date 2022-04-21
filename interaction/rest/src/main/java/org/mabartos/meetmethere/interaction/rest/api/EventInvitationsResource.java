@@ -2,7 +2,8 @@ package org.mabartos.meetmethere.interaction.rest.api;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.dto.EventInvitation;
+import org.mabartos.meetmethere.api.domain.EventInvitation;
+import org.mabartos.meetmethere.interaction.rest.api.model.EventInvitationJson;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -26,14 +27,14 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 public interface EventInvitationsResource {
 
     @GET
-    Multi<EventInvitation> getInvitations(@QueryParam(FIRST_RESULT) int firstResult,
-                                          @QueryParam(MAX_RESULTS) int maxResults);
+    Multi<EventInvitationJson> getInvitations(@QueryParam(FIRST_RESULT) int firstResult,
+                                              @QueryParam(MAX_RESULTS) int maxResults);
 
     @POST
-    Uni<EventInvitation> createInvitation(EventInvitation invitation);
+    Uni<EventInvitationJson> createInvitation(EventInvitationJson invitation);
 
     @POST
-    Uni<EventInvitation> sendInvitation(Long receiverId);
+    Uni<EventInvitationJson> sendInvitation(Long receiverId);
 
     @DELETE
     Response removeInvitations();

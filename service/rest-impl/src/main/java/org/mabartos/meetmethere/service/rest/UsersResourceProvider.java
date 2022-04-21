@@ -2,13 +2,14 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.ModelToDto;
-import org.mabartos.meetmethere.dto.User;
+import org.mabartos.meetmethere.api.domain.User;
+import org.mabartos.meetmethere.api.model.UserModel;
+import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
 import org.mabartos.meetmethere.interaction.rest.api.UsersResource;
-import org.mabartos.meetmethere.model.UserModel;
-import org.mabartos.meetmethere.model.exception.ModelDuplicateException;
-import org.mabartos.meetmethere.session.MeetMeThereSession;
+import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
+import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
 
 import javax.enterprise.context.RequestScoped;
 import javax.transaction.Transactional;
@@ -24,11 +25,10 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import static org.mabartos.meetmethere.DtoToModel.updateModel;
-import static org.mabartos.meetmethere.ModelToDto.toDto;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;
+import static org.mabartos.meetmethere.interaction.rest.api.model.JsonToModel.updateModel;
 
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -59,8 +59,8 @@ public class UsersResourceProvider implements UsersResource {
     }
 
     @GET
-    public Multi<User> getUsers(@QueryParam(FIRST_RESULT) Integer firstResult,
-                                @QueryParam(MAX_RESULTS) Integer maxResults) {
+    public Multi<UserJson> getUsers(@QueryParam(FIRST_RESULT) Integer firstResult,
+                                    @QueryParam(MAX_RESULTS) Integer maxResults) {
         firstResult = firstResult != null ? firstResult : 0;
         maxResults = maxResults != null ? maxResults : Integer.MAX_VALUE;
 
@@ -68,7 +68,7 @@ public class UsersResourceProvider implements UsersResource {
                 .items(session.users()
                         .getUsers(firstResult, maxResults)
                         .stream()
-                        .map(ModelToDto::toDto)
+                        .map(ModelToJson::toJson)
                         .distinct()
                         .toArray())
                 .onItem()
@@ -82,14 +82,14 @@ public class UsersResourceProvider implements UsersResource {
     }
 
     @POST
-    public Uni<User> createUser(User user) {
+    public Uni<UserJson> createUser(UserJson user) {
         try {
             UserModel model = session.users().createUser(user.getEmail(), user.getUsername());
             updateModel(user, model);
 
             session.users().updateUser(model);
 
-            return Uni.createFrom().item(toDto(session.users().getUserById(user.getId())));
+            return Uni.createFrom().item(ModelToJson.toJson(session.users().getUserById(user.getId())));
         } catch (ModelDuplicateException e) {
             throw new BadRequestException("User already exists.");
         }

@@ -1,11 +1,13 @@
 package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.dto.User;
+import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
-import org.mabartos.meetmethere.model.UserModel;
-import org.mabartos.meetmethere.model.exception.ModelNotFoundException;
-import org.mabartos.meetmethere.session.MeetMeThereSession;
+import org.mabartos.meetmethere.api.model.UserModel;
+import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
+import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
+import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -14,8 +16,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static org.mabartos.meetmethere.DtoToModel.updateModel;
-import static org.mabartos.meetmethere.ModelToDto.toDto;
+import static org.mabartos.meetmethere.interaction.rest.api.model.JsonToModel.updateModel;
+import static org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson.toJson;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
@@ -31,8 +33,8 @@ public class UserResourceProvider implements UserResource {
     }
 
     @Override
-    public Uni<User> getUser() {
-        return Uni.createFrom().item(toDto(user));
+    public Uni<UserJson> getUser() {
+        return Uni.createFrom().item(ModelToJson.toJson(user));
     }
 
     @Override
@@ -46,7 +48,7 @@ public class UserResourceProvider implements UserResource {
     }
 
     @Override
-    public Uni<User> updateUser(User user) {
+    public Uni<UserJson> updateUser(UserJson user) {
         try {
             updateModel(user, this.user);
             session.users().updateUser(this.user);
@@ -55,6 +57,6 @@ public class UserResourceProvider implements UserResource {
         }
 
         return Uni.createFrom()
-                .item(toDto(session.users().getUserById(this.user.getId())));
+                .item(ModelToJson.toJson(session.users().getUserById(this.user.getId())));
     }
 }

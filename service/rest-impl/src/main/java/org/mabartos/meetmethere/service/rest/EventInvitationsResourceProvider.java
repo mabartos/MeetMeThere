@@ -2,14 +2,15 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.ModelToDto;
-import org.mabartos.meetmethere.dto.EventInvitation;
+import org.mabartos.meetmethere.interaction.rest.api.model.EventInvitationJson;
+import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
+import org.mabartos.meetmethere.api.domain.EventInvitation;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationsResource;
-import org.mabartos.meetmethere.model.EventModel;
-import org.mabartos.meetmethere.model.InvitationModel;
-import org.mabartos.meetmethere.model.UserModel;
-import org.mabartos.meetmethere.session.MeetMeThereSession;
+import org.mabartos.meetmethere.api.model.EventModel;
+import org.mabartos.meetmethere.api.model.InvitationModel;
+import org.mabartos.meetmethere.api.model.UserModel;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
@@ -24,8 +25,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import static org.mabartos.meetmethere.DtoToModel.updateModel;
-import static org.mabartos.meetmethere.ModelToDto.toDto;
+import static org.mabartos.meetmethere.interaction.rest.api.model.JsonToModel.updateModel;
+import static org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson.toJson;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;
@@ -43,13 +44,13 @@ public class EventInvitationsResourceProvider implements EventInvitationsResourc
     }
 
     @GET
-    public Multi<EventInvitation> getInvitations(@QueryParam(FIRST_RESULT) int firstResult,
-                                                 @QueryParam(MAX_RESULTS) int maxResults) {
+    public Multi<EventInvitationJson> getInvitations(@QueryParam(FIRST_RESULT) int firstResult,
+                                                     @QueryParam(MAX_RESULTS) int maxResults) {
         return Multi.createFrom()
                 .items(session.invitations()
                         .getInvitationsForEvent(event.getId())
                         .stream()
-                        .map(ModelToDto::toDto)
+                        .map(ModelToJson::toJson)
                         .distinct()
                         .toArray())
                 .onItem()
@@ -57,7 +58,7 @@ public class EventInvitationsResourceProvider implements EventInvitationsResourc
     }
 
     @POST
-    public Uni<EventInvitation> createInvitation(EventInvitation invitation) {
+    public Uni<EventInvitationJson> createInvitation(EventInvitationJson invitation) {
         if (session.invitations().getInvitationById(invitation.getId()) != null) {
             throw new BadRequestException("Invitation already exist");
         }
@@ -71,15 +72,15 @@ public class EventInvitationsResourceProvider implements EventInvitationsResourc
 
         updateModel(invitation, model);
 
-        return Uni.createFrom().item(session.invitations().updateInvitation(model)).map(ModelToDto::toDto);
+        return Uni.createFrom().item(session.invitations().updateInvitation(model)).map(ModelToJson::toJson);
     }
 
     @POST
-    public Uni<EventInvitation> sendInvitation(Long receiverId) {
+    public Uni<EventInvitationJson> sendInvitation(Long receiverId) {
         final UserModel sender = null; // TODO principal
         final UserModel receiver = session.users().getUserById(receiverId);
 
-        return Uni.createFrom().item(toDto(session.invitations().createInvitation(event, sender, receiver)));
+        return Uni.createFrom().item(toJson(session.invitations().createInvitation(event, sender, receiver)));
     }
 
     @DELETE

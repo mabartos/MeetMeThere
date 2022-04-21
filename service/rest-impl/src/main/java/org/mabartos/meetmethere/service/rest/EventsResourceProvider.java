@@ -2,14 +2,15 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.ModelToDto;
-import org.mabartos.meetmethere.dto.Event;
+import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
+import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
+import org.mabartos.meetmethere.api.domain.Event;
 import org.mabartos.meetmethere.interaction.rest.api.EventResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventsResource;
-import org.mabartos.meetmethere.model.Coordinates;
-import org.mabartos.meetmethere.model.EventModel;
-import org.mabartos.meetmethere.model.UserModel;
-import org.mabartos.meetmethere.session.MeetMeThereSession;
+import org.mabartos.meetmethere.api.model.Coordinates;
+import org.mabartos.meetmethere.api.model.EventModel;
+import org.mabartos.meetmethere.api.model.UserModel;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.enterprise.context.RequestScoped;
 import javax.transaction.Transactional;
@@ -25,8 +26,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
-import static org.mabartos.meetmethere.DtoToModel.updateModel;
-import static org.mabartos.meetmethere.ModelToDto.toDto;
+import static org.mabartos.meetmethere.interaction.rest.api.model.JsonToModel.updateModel;
+import static org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson.toJson;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;
@@ -42,12 +43,12 @@ public class EventsResourceProvider implements EventsResource {
     MeetMeThereSession session;
 
     @GET
-    public Multi<Event> getEvents(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults) {
+    public Multi<EventJson> getEvents(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults) {
         return Multi.createFrom()
                 .items(session.events()
                         .getEvents(firstResult, maxResults)
                         .stream()
-                        .map(ModelToDto::toDto)
+                        .map(ModelToJson::toJson)
                         .distinct()
                         .toArray())
                 .onItem()
@@ -61,18 +62,18 @@ public class EventsResourceProvider implements EventsResource {
 
     @GET
     @Path("/{title}")
-    public Multi<Event> searchEventsByTitle(@PathParam("title") String title) {
+    public Multi<EventJson> searchEventsByTitle(@PathParam("title") String title) {
         final Set<EventModel> events = session.events().searchByTitle(title);
 
         return Multi.createFrom()
-                .items(events.stream().map(ModelToDto::toDto))
+                .items(events.stream().map(ModelToJson::toJson))
                 .onItem()
                 .castTo(Event.class);
     }
 
     @GET
     @Path("/coordinates")
-    public Multi<Event> searchEventsByCoordinates(@QueryParam("longitude") Double longitude,
+    public Multi<EventJson> searchEventsByCoordinates(@QueryParam("longitude") Double longitude,
                                                   @QueryParam("latitude") Double latitude) {
         if (longitude == null || latitude == null) {
             throw new BadRequestException("You need to specify both longitude and latitude.");
@@ -81,13 +82,13 @@ public class EventsResourceProvider implements EventsResource {
         final Set<EventModel> events = session.events().searchByCoordinates(new Coordinates(longitude, latitude));
 
         return Multi.createFrom()
-                .items(events.stream().map(ModelToDto::toDto))
+                .items(events.stream().map(ModelToJson::toJson))
                 .onItem()
                 .castTo(Event.class);
     }
 
     @POST
-    public Uni<Event> createEvent(Event event) {
+    public Uni<EventJson> createEvent(EventJson event) {
         if (event.getId() != null && session.events().getEventById(event.getId()) != null) {
             throw new BadRequestException("Event already exists with the id.");
         }
@@ -97,7 +98,7 @@ public class EventsResourceProvider implements EventsResource {
         EventModel model = session.events().createEvent(event.getTitle(), creator);
         updateModel(event, model);
 
-        return Uni.createFrom().item(toDto(session.events().updateEvent(model)));
+        return Uni.createFrom().item(ModelToJson.toJson(session.events().updateEvent(model)));
     }
 
     @GET
