@@ -19,8 +19,6 @@ public class ModelToJson {
         update(user::setFirstName, model::getFirstName);
         update(user::setLastName, model::getLastName);
         update(user::setAttributes, model::getAttributes);
-
-        update(user::setOrganizedEventsId, () -> model.getOrganizedEvents().stream().map(HasId::getId).collect(Collectors.toSet()));
         return user;
     }
 

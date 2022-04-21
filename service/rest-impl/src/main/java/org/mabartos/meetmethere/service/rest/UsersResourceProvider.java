@@ -1,12 +1,13 @@
 package org.mabartos.meetmethere.service.rest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
+import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
 import org.mabartos.meetmethere.api.model.eventbus.UserModelSet;
-import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
@@ -16,7 +17,6 @@ import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
 
 import javax.enterprise.context.RequestScoped;
 import javax.transaction.Transactional;
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -31,7 +31,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.mabartos.meetmethere.api.model.ModelUpdater.updateModel;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;
@@ -42,7 +41,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @RequestScoped
 @Transactional
 public class UsersResourceProvider implements UsersResource {
-
+    private static final ObjectMapper mapper = new ObjectMapper();
     public static final Duration MAX_WAITING_TIME = Duration.ofSeconds(5);
 
     @Context
@@ -75,7 +74,7 @@ public class UsersResourceProvider implements UsersResource {
     }
 
     @Path("/email/{email}")
-    public UserResource getUserByEmail(String email) {
+    public UserResource getUserByEmail(@PathParam("email") String email) {
         final UserModel user = session.eventBus()
                 .<UserModel>request(UserService.USER_GET_EMAIL_EVENT, email)
                 .onItem()
@@ -102,17 +101,19 @@ public class UsersResourceProvider implements UsersResource {
     }
 
     @POST
-    public Uni<UserJson> createUser(UserJson user) {
-        try {
-            UserModel model = session.userStorage().createUser(user.getEmail(), user.getUsername());
-            updateModel(user, model);
+    public void createUser(UserJson user) {
+        User newUser = new User(user.getUsername(), user.getEmail());
 
-            session.userStorage().updateUser(model);
+        //Workaround for now, because there's no codec for inherited UserJson and User POJO
+        newUser.setFirstName(user.getFirstName());
+        newUser.setLastName(user.getLastName());
+        newUser.setAttributes(user.getAttributes());
 
-            return Uni.createFrom().item(ModelToJson.toJson(session.userStorage().getUserById(user.getId())));
-        } catch (ModelDuplicateException e) {
-            throw new BadRequestException("User already exists.");
-        }
+        session.eventBus().send(UserService.USER_CREATE_EVENT, newUser);
+
+       /* return getSingleUser(session.eventBus(), UserService.USER_CREATE_EVENT, newUser)
+                .onFailure(ModelDuplicateException.class)
+                .transform(f -> new WebApplicationException(f.getMessage(), 409));*/
     }
 
     protected static Uni<UserJson> getSingleUser(EventBus bus, String address, Object object) {

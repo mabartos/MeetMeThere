@@ -15,11 +15,12 @@ import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.util.Optional;
 
 @ApplicationScoped
+@Transactional
 public class DefaultUserService implements UserService {
-
     private final MeetMeThereSession session;
 
     @Inject
@@ -60,21 +61,17 @@ public class DefaultUserService implements UserService {
 
     @Override
     @ConsumeEvent(value = USER_CREATE_BASIC_EVENT, blocking = true)
-    public Uni<UserModel> createUser(EmailUsernameObject object) throws ModelDuplicateException {
-        UserModel model = session.userStorage().createUser(object.getEmail(), object.getUsername());
-
-        final UserModel created = session.userStorage().updateUser(model);
-        return Uni.createFrom().item(created);
+    public void createUser(EmailUsernameObject object) throws ModelDuplicateException {
+        session.userStorage().createUser(object.getEmail(), object.getUsername());
     }
 
     @Override
     @ConsumeEvent(value = USER_CREATE_EVENT, blocking = true)
-    public Uni<UserModel> createUser(User user) throws ModelDuplicateException {
+    public void createUser(User user) throws ModelDuplicateException {
         UserModel model = session.userStorage().createUser(user.getEmail(), user.getUsername());
         ModelUpdater.updateModel(user, model);
 
-        final UserModel created = session.userStorage().updateUser(model);
-        return Uni.createFrom().item(created);
+        session.userStorage().updateUser(model);
     }
 
     @Override

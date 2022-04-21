@@ -42,5 +42,5 @@ public interface UsersResource {
     Uni<Long> getUsersCount();
 
     @POST
-    Uni<UserJson> createUser(UserJson user);
+    void createUser(UserJson user);
 }
