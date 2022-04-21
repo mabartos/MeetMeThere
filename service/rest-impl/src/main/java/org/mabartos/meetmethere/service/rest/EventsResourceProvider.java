@@ -6,6 +6,7 @@ import io.vertx.mutiny.core.eventbus.Message;
 import org.mabartos.meetmethere.api.codecs.SetHolder;
 import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.EventModel;
+import org.mabartos.meetmethere.api.model.eventbus.EventModelSet;
 import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
 import org.mabartos.meetmethere.api.service.EventService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
@@ -87,7 +88,7 @@ public class EventsResourceProvider implements EventsResource {
     }
 
     protected static Uni<Set<EventJson>> getSetOfEvents(EventBus bus, String address, Object object) {
-        return bus.<SetHolder<EventModel>>request(address, object)
+        return bus.<EventModelSet>request(address, object)
                 .onItem()
                 .transform(Message::body)
                 .map(f -> f.getSet()

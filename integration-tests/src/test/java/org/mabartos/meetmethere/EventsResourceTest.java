@@ -1,14 +1,16 @@
 package org.mabartos.meetmethere;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
-import org.mabartos.meetmethere.api.domain.Event;
-import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
+import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
 import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
+import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
@@ -17,11 +19,12 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
-import static org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson.toJson;
 
 @QuarkusTest
 @TestTransaction
 public class EventsResourceTest {
+
+    private static final ObjectMapper mapper = new ObjectMapper();
 
     @Inject
     MeetMeThereSession session;
@@ -37,19 +40,19 @@ public class EventsResourceTest {
     }
 
     @Test
-    public void createEvent() throws ModelDuplicateException {
-        User dto = ModelToJson.toJson(session.users().createUser("email@test", "username"));
+    public void createEvent() throws ModelDuplicateException, JsonProcessingException {
+        UserJson dto = ModelToJson.toJson(session.userStorage().createUser("email@test", "username"));
         assertThat(dto, notNullValue());
 
-        final UserModel found = session.users().getUserById(dto.getId());
+        final UserModel found = session.userStorage().getUserById(dto.getId());
         assertThat(found, notNullValue());
         assertThat(found.getUsername(), is("username"));
         assertThat(found.getEmail(), is("email@test"));
 
-        Event event = new Event("New Event", dto);
+        EventJson event = new EventJson("New Event", dto.getId(), String.format("%s %s", dto.getFirstName(), dto.getLastName()));
         given()
                 .when()
-                .body(event)
+                .body(mapper.writeValueAsString(event))
                 .contentType(MediaType.APPLICATION_JSON)
                 .post("/events")
                 .then()
@@ -57,7 +60,7 @@ public class EventsResourceTest {
 
     }
 
-    private void assertEvents(Event... events) {
+    private void assertEvents(EventJson... events) {
         given()
                 .when().get("/events")
                 .then()

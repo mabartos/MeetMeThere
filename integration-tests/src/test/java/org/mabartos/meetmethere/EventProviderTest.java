@@ -30,12 +30,12 @@ public class EventProviderTest {
     public void createEvent() throws ModelDuplicateException {
         final EventModel model = assertCreateEvent("New Event");
 
-        assertThat(session.eventsStorage().getEventsCount(), is(1L));
+        assertThat(session.eventStorage().getEventsCount(), is(1L));
 
-        final EventModel foundById = session.eventsStorage().getEventById(model.getId());
+        final EventModel foundById = session.eventStorage().getEventById(model.getId());
         assertThat(foundById, notNullValue());
         assertThat(foundById, is(model));
-        final Set<EventModel> events = session.eventsStorage().getEvents(0, Integer.MAX_VALUE);
+        final Set<EventModel> events = session.eventStorage().getEvents(0, Integer.MAX_VALUE);
         assertThat(events, notNullValue());
         assertThat(events.size(), is(1));
 
@@ -52,7 +52,7 @@ public class EventProviderTest {
         model.setStartTime(LocalDateTime.of(2022, 4, 17, 20, 0));
         model.setEndTime(LocalDateTime.of(2022, 4, 17, 22, 0));
         model.setAttribute("something", "exciting");
-        EventModel updated = session.eventsStorage().updateEvent(model);
+        EventModel updated = session.eventStorage().updateEvent(model);
 
         assertThat(updated, notNullValue());
         assertThat(updated.getStartTime(), is(LocalDateTime.of(2022, 4, 17, 20, 0)));
@@ -68,27 +68,27 @@ public class EventProviderTest {
     public void removeEvent() throws ModelNotFoundException, ModelDuplicateException {
         final EventModel model = assertCreateEvent("New Event");
 
-        assertThat(session.eventsStorage().getEventsCount(), is(1L));
+        assertThat(session.eventStorage().getEventsCount(), is(1L));
 
-        session.eventsStorage().removeEvent(model.getId());
+        session.eventStorage().removeEvent(model.getId());
 
-        assertThat(session.eventsStorage().getEventsCount(), is(0L));
+        assertThat(session.eventStorage().getEventsCount(), is(0L));
     }
 
     @Test
     public void removeInvalidEvent() {
         try {
-            session.eventsStorage().removeEvent(-4L);
+            session.eventStorage().removeEvent(-4L);
             Assertions.fail();
         } catch (ModelNotFoundException expected) {
         }
     }
 
     private EventModel assertCreateEvent(String title) throws ModelDuplicateException {
-        UserModel creator = session.users().createUser("creator@mail", "creator123");
+        UserModel creator = session.userStorage().createUser("creator@mail", "creator123");
         assertThat(creator, notNullValue());
 
-        EventModel model = session.eventsStorage().createEvent(title, creator);
+        EventModel model = session.eventStorage().createEvent(title, creator);
         assertThat(model, notNullValue());
         assertThat(model.getEventTitle(), is(title));
         assertThat(model.getId(), notNullValue());

@@ -1,8 +1,6 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
 
 import javax.transaction.Transactional;
@@ -14,6 +12,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+import java.util.Set;
 
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
@@ -31,9 +30,12 @@ public interface UsersResource {
     @Path("/{username}")
     UserResource getUserByUsername(@PathParam("username") String username);
 
+    @Path("/email/{email}")
+    UserResource getUserByEmail(@PathParam("email") String email);
+
     @GET
-    Multi<UserJson> getUsers(@QueryParam(FIRST_RESULT) Integer firstResult,
-                             @QueryParam(MAX_RESULTS) Integer maxResults);
+    Uni<Set<UserJson>> getUsers(@QueryParam(FIRST_RESULT) Integer firstResult,
+                                @QueryParam(MAX_RESULTS) Integer maxResults);
 
     @GET
     @Path("/count")

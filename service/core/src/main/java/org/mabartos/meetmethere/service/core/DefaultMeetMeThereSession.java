@@ -11,6 +11,7 @@ import org.mabartos.meetmethere.api.provider.EventProvider;
 import org.mabartos.meetmethere.api.provider.InvitationProvider;
 import org.mabartos.meetmethere.api.provider.UserProvider;
 import org.mabartos.meetmethere.api.service.EventService;
+import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.enterprise.context.RequestScoped;
@@ -30,7 +31,12 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
     EventBus eventBus;
 
     @Override
-    public UserProvider users() {
+    public UserService users() {
+        return new DefaultUserService(this);
+    }
+
+    @Override
+    public UserProvider userStorage() {
         return new JpaUserProviderFactory().create(this);
     }
 
@@ -40,7 +46,7 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
     }
 
     @Override
-    public EventProvider eventsStorage() {
+    public EventProvider eventStorage() {
         return new JpaEventProviderFactory().create(this);
     }
 

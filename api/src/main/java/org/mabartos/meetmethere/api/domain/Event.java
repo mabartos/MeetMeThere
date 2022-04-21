@@ -46,10 +46,10 @@ public class Event implements Serializable {
 
     private Map<String, String> attributes;
 
-    public Event(String title, User createdBy) {
+    public Event(String title, Long createdById, String createdByFullName) {
         this.title = title;
-        this.createdByName = String.format("%s %s", createdBy.getFirstName(), createdBy.getLastName());
-        this.createdById = createdBy.getId();
+        this.createdByName = createdByFullName;
+        this.createdById = createdById;
         this.organizersId = new HashSet<>();
         this.attributes = new HashMap<>();
         this.invitationsId = new HashSet<>();

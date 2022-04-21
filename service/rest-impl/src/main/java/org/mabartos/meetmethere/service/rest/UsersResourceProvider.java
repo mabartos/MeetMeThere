@@ -1,9 +1,13 @@
 package org.mabartos.meetmethere.service.rest;
 
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
+import io.vertx.mutiny.core.eventbus.EventBus;
+import io.vertx.mutiny.core.eventbus.Message;
 import org.mabartos.meetmethere.api.model.UserModel;
+import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
+import org.mabartos.meetmethere.api.model.eventbus.UserModelSet;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
+import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
 import org.mabartos.meetmethere.interaction.rest.api.UsersResource;
@@ -15,7 +19,6 @@ import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.NotFoundException;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -23,11 +26,15 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import java.time.Duration;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import static org.mabartos.meetmethere.api.model.ModelUpdater.updateModel;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;
-import static org.mabartos.meetmethere.api.model.ModelUpdater.updateModel;
 
 @Path("/users")
 @Consumes(MediaType.APPLICATION_JSON)
@@ -36,61 +43,91 @@ import static org.mabartos.meetmethere.api.model.ModelUpdater.updateModel;
 @Transactional
 public class UsersResourceProvider implements UsersResource {
 
+    public static final Duration MAX_WAITING_TIME = Duration.ofSeconds(5);
+
     @Context
     MeetMeThereSession session;
 
     @GET
     @Path("/{id}")
     public UserResource getUserById(@PathParam(ID) Long id) {
-        return new UserResourceProvider(session, session.users().getUserById(id));
-    }
-
-    @GET
-    @Path("/{username}")
-    public UserResource getUserByUsername(@PathParam("username") String username) {
-        final UserModel user = session.users().getUserByUsername(username);
-
-        if (user == null) {
-            throw new NotFoundException("Cannot find user with username: " + username);
-        }
+        final UserModel user = session.eventBus()
+                .<UserModel>request(UserService.USER_GET_USER_EVENT, id)
+                .onItem()
+                .transform(Message::body)
+                .await()
+                .atMost(MAX_WAITING_TIME);
 
         return new UserResourceProvider(session, user);
     }
 
     @GET
-    public Multi<UserJson> getUsers(@QueryParam(FIRST_RESULT) Integer firstResult,
-                                    @QueryParam(MAX_RESULTS) Integer maxResults) {
+    @Path("/{username}")
+    public UserResource getUserByUsername(@PathParam("username") String username) {
+        final UserModel user = session.eventBus()
+                .<UserModel>request(UserService.USER_GET_USERNAME_EVENT, username)
+                .onItem()
+                .transform(Message::body)
+                .await()
+                .atMost(MAX_WAITING_TIME);
+
+        return new UserResourceProvider(session, user);
+    }
+
+    @Path("/email/{email}")
+    public UserResource getUserByEmail(String email) {
+        final UserModel user = session.eventBus()
+                .<UserModel>request(UserService.USER_GET_EMAIL_EVENT, email)
+                .onItem()
+                .transform(Message::body)
+                .await()
+                .atMost(MAX_WAITING_TIME);
+
+        return new UserResourceProvider(session, user);
+    }
+
+    @GET
+    public Uni<Set<UserJson>> getUsers(@QueryParam(FIRST_RESULT) Integer firstResult,
+                                       @QueryParam(MAX_RESULTS) Integer maxResults) {
         firstResult = firstResult != null ? firstResult : 0;
         maxResults = maxResults != null ? maxResults : Integer.MAX_VALUE;
 
-        return Multi.createFrom()
-                .items(session.users()
-                        .getUsers(firstResult, maxResults)
-                        .stream()
-                        .map(ModelToJson::toJson)
-                        .distinct()
-                        .toArray())
-                .onItem()
-                .castTo(UserJson.class);
+        return getSetOfUsers(session.eventBus(), UserService.USER_GET_USERS_EVENT, new PaginationObject(firstResult, maxResults));
     }
 
     @GET
     @Path("/count")
     public Uni<Long> getUsersCount() {
-        return Uni.createFrom().item(session.users().getUsersCount());
+        return Uni.createFrom().item(session.userStorage().getUsersCount());
     }
 
     @POST
     public Uni<UserJson> createUser(UserJson user) {
         try {
-            UserModel model = session.users().createUser(user.getEmail(), user.getUsername());
+            UserModel model = session.userStorage().createUser(user.getEmail(), user.getUsername());
             updateModel(user, model);
 
-            session.users().updateUser(model);
+            session.userStorage().updateUser(model);
 
-            return Uni.createFrom().item(ModelToJson.toJson(session.users().getUserById(user.getId())));
+            return Uni.createFrom().item(ModelToJson.toJson(session.userStorage().getUserById(user.getId())));
         } catch (ModelDuplicateException e) {
             throw new BadRequestException("User already exists.");
         }
+    }
+
+    protected static Uni<UserJson> getSingleUser(EventBus bus, String address, Object object) {
+        return bus.<UserModel>request(address, object).onItem().transform(Message::body).map(ModelToJson::toJson);
+    }
+
+    protected static Uni<Set<UserJson>> getSetOfUsers(EventBus bus, String address, Object object) {
+        return bus.<UserModelSet>request(address, object)
+                .onItem()
+                .transform(Message::body)
+                .map(f -> f.getSet()
+                        .stream()
+                        .filter(Objects::nonNull)
+                        .map(ModelToJson::toJson)
+                        .collect(Collectors.toSet())
+                );
     }
 }

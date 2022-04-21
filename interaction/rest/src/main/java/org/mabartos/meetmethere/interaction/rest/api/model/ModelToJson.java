@@ -25,7 +25,11 @@ public class ModelToJson {
     }
 
     public static EventJson toJson(EventModel model) {
-        EventJson event = new EventJson(model.getEventTitle(), toJson(model.getCreatedBy()));
+        EventJson event = new EventJson(model.getEventTitle(),
+                model.getCreatedBy().getId(),
+                String.format("%s %s", model.getCreatedBy().getFirstName(), model.getCreatedBy().getLastName())
+        );
+
         update(event::setId, model::getId);
         update(event::setDescription, model::getDescription);
         update(event::setPublic, model::isPublic);

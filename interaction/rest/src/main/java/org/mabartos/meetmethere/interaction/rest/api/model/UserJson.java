@@ -2,13 +2,15 @@ package org.mabartos.meetmethere.interaction.rest.api.model;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.mabartos.meetmethere.api.domain.User;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class UserJson extends User {
 
     @JsonCreator
-    public UserJson(String username, String email) {
+    public UserJson(@JsonProperty("username") String username,
+                    @JsonProperty("email") String email) {
         super(username, email);
     }
 
