@@ -3,7 +3,6 @@ package org.mabartos.meetmethere.service.rest;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
-import org.mabartos.meetmethere.api.codecs.SetHolder;
 import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.eventbus.EventModelSet;
@@ -14,6 +13,8 @@ import org.mabartos.meetmethere.interaction.rest.api.EventResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventsResource;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
 import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
+import org.mabartos.meetmethere.interaction.rest.api.model.mapper.EventJsonDomainMapper;
+import org.mapstruct.factory.Mappers;
 
 import javax.enterprise.context.RequestScoped;
 import javax.transaction.Transactional;
@@ -41,6 +42,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @RequestScoped
 @Transactional
 public class EventsResourceProvider implements EventsResource {
+    private final EventJsonDomainMapper mapper = Mappers.getMapper(EventJsonDomainMapper.class);
 
     @Context
     MeetMeThereSession session;
@@ -74,7 +76,7 @@ public class EventsResourceProvider implements EventsResource {
 
     @POST
     public Uni<EventJson> createEvent(EventJson event) {
-        return getSingleEvent(session.eventBus(), EventService.EVENT_CREATE_EVENT, event);
+        return getSingleEvent(session.eventBus(), EventService.EVENT_CREATE_EVENT, mapper.toDomain(event));
     }
 
     @GET

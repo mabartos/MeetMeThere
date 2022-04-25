@@ -37,7 +37,9 @@ public class JpaEventProvider implements EventProvider {
 
     @Override
     public EventModel getEventById(Long id) {
-        return new JpaEventAdapter(session, em, EventEntity.findById(id));
+        final EventEntity entity = EventEntity.findById(id);
+        if (entity == null) return null;
+        return new JpaEventAdapter(session, em, entity);
     }
 
     @Override

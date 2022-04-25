@@ -19,7 +19,7 @@ public interface EventService {
     String EVENT_SEARCH_COORDINATES_EVENT = "eventSearchByCoordinatesEvent";
     String EVENT_COUNT_EVENT = "eventCountEvent";
 
-    Uni<EventModel> createEvent(Event event) throws ModelDuplicateException;
+    Uni<Long> createEvent(Event event) throws ModelDuplicateException;
 
     Uni<EventModel> updateEvent(Event event) throws ModelNotFoundException;
 

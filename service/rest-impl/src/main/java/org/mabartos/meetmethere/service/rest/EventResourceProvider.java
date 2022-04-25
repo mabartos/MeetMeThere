@@ -6,6 +6,8 @@ import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationsResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventResource;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
+import org.mabartos.meetmethere.interaction.rest.api.model.mapper.EventJsonDomainMapper;
+import org.mapstruct.factory.Mappers;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.BadRequestException;
@@ -24,6 +26,7 @@ import static org.mabartos.meetmethere.service.rest.EventsResourceProvider.getSi
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
 public class EventResourceProvider implements EventResource {
+    private final EventJsonDomainMapper mapper = Mappers.getMapper(EventJsonDomainMapper.class);
     private final MeetMeThereSession session;
     private final Long eventId;
 
@@ -50,7 +53,7 @@ public class EventResourceProvider implements EventResource {
         }
         event.setId(eventId);
 
-        return getSingleEvent(session.eventBus(), EventService.EVENT_UPDATE_EVENT, event);
+        return getSingleEvent(session.eventBus(), EventService.EVENT_UPDATE_EVENT, mapper.toDomain(event));
     }
 
     @Path("/invitations")

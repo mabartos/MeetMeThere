@@ -33,7 +33,9 @@ public class JpaUserProvider implements UserProvider {
 
     @Override
     public UserModel getUserById(Long id) {
-        return new JpaUserAdapter(session, em, UserEntity.findById(id));
+        final UserEntity entity = UserEntity.findById(id);
+        if (entity == null) return null;
+        return new JpaUserAdapter(session, em, entity);
     }
 
     @Override

@@ -35,7 +35,9 @@ public class JpaEventInvitationProvider implements InvitationProvider {
 
     @Override
     public InvitationModel getInvitationById(Long id) {
-        return new JpaInvitationAdapter(session, em, InvitationEntity.findById(id));
+        final InvitationEntity entity = InvitationEntity.findById(id);
+        if (entity == null) return null;
+        return new JpaInvitationAdapter(session, em, entity);
     }
 
     @Override

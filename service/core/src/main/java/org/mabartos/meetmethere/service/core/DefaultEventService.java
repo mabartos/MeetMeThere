@@ -31,7 +31,7 @@ public class DefaultEventService implements EventService {
 
     @Override
     @ConsumeEvent(value = EVENT_CREATE_EVENT, blocking = true)
-    public Uni<EventModel> createEvent(Event event) throws ModelDuplicateException {
+    public Uni<Long> createEvent(Event event) throws ModelDuplicateException {
         if (event.getId() != null && session.eventStorage().getEventById(event.getId()) != null) {
             throw new ModelDuplicateException("Event already exists with the id.");
         }
@@ -41,7 +41,7 @@ public class DefaultEventService implements EventService {
         EventModel model = session.eventStorage().createEvent(event.getTitle(), creator);
         ModelUpdater.updateModel(event, model);
 
-        return Uni.createFrom().item(session.eventStorage().updateEvent(model));
+        return Uni.createFrom().item(session.eventStorage().updateEvent(model).getId());
 
     }
 

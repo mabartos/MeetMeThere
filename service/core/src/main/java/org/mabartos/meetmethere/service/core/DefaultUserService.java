@@ -31,7 +31,8 @@ public class DefaultUserService implements UserService {
     @Override
     @ConsumeEvent(value = USER_GET_USER_EVENT, blocking = true)
     public Uni<UserModel> getUserById(Long id) {
-        return Uni.createFrom().item(session.userStorage().getUserById(id));
+        final UserModel model = session.userStorage().getUserById(id);
+        return model == null ? Uni.createFrom().failure(new ModelNotFoundException()) : Uni.createFrom().item(model);
     }
 
     @Override
@@ -61,17 +62,18 @@ public class DefaultUserService implements UserService {
 
     @Override
     @ConsumeEvent(value = USER_CREATE_BASIC_EVENT, blocking = true)
-    public void createUser(EmailUsernameObject object) throws ModelDuplicateException {
-        session.userStorage().createUser(object.getEmail(), object.getUsername());
+    public Uni<Long> createUser(EmailUsernameObject object) throws ModelDuplicateException {
+        return Uni.createFrom().item(session.userStorage().createUser(object.getEmail(), object.getUsername()).getId());
     }
 
     @Override
     @ConsumeEvent(value = USER_CREATE_EVENT, blocking = true)
-    public void createUser(User user) throws ModelDuplicateException {
+    public Uni<Long> createUser(User user) throws ModelDuplicateException {
         UserModel model = session.userStorage().createUser(user.getEmail(), user.getUsername());
         ModelUpdater.updateModel(user, model);
 
-        session.userStorage().updateUser(model);
+        final Long id = session.userStorage().updateUser(model).getId();
+        return Uni.createFrom().item(id);
     }
 
     @Override

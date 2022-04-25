@@ -1,6 +1,7 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
 import io.smallrye.mutiny.Uni;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
 
 import javax.transaction.Transactional;
@@ -22,16 +23,19 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
+@Tag(name = "Users Resource API", description = "Provide API for all users.")
 public interface UsersResource {
 
     @Path("/{id}")
     UserResource getUserById(@PathParam(ID) Long id);
 
+    @GET
     @Path("/{username}")
-    UserResource getUserByUsername(@PathParam("username") String username);
+    Uni<UserJson> getUserByUsername(@PathParam("username") String username);
 
+    @GET
     @Path("/email/{email}")
-    UserResource getUserByEmail(@PathParam("email") String email);
+    Uni<UserJson> getUserByEmail(@PathParam("email") String email);
 
     @GET
     Uni<Set<UserJson>> getUsers(@QueryParam(FIRST_RESULT) Integer firstResult,
@@ -42,5 +46,5 @@ public interface UsersResource {
     Uni<Long> getUsersCount();
 
     @POST
-    void createUser(UserJson user);
+    Uni<Long> createUser(UserJson user);
 }

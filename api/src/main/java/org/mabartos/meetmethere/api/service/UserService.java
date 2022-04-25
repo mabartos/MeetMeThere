@@ -30,9 +30,9 @@ public interface UserService {
 
     Uni<Long> getUsersCount(Object ignore);
 
-    void createUser(EmailUsernameObject object) throws ModelDuplicateException;
+    Uni<Long> createUser(EmailUsernameObject object) throws ModelDuplicateException;
 
-    void createUser(User user) throws ModelDuplicateException;
+    Uni<Long> createUser(User user) throws ModelDuplicateException;
 
     void removeUser(Long id) throws ModelNotFoundException;
 

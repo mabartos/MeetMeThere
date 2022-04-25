@@ -1,19 +1,18 @@
 package org.mabartos.meetmethere.service.rest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
-import io.vertx.mutiny.core.eventbus.Message;
-import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
-import org.mabartos.meetmethere.api.model.eventbus.UserModelSet;
 import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
 import org.mabartos.meetmethere.interaction.rest.api.UsersResource;
 import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
 import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
+import org.mabartos.meetmethere.interaction.rest.api.model.mapper.UserJsonDomainMapper;
+import org.mabartos.meetmethere.service.rest.util.EventBusUtil;
+import org.mapstruct.factory.Mappers;
 
 import javax.enterprise.context.RequestScoped;
 import javax.transaction.Transactional;
@@ -26,10 +25,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.time.Duration;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.logging.Logger;
 
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
@@ -41,8 +38,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @RequestScoped
 @Transactional
 public class UsersResourceProvider implements UsersResource {
-    private static final ObjectMapper mapper = new ObjectMapper();
-    public static final Duration MAX_WAITING_TIME = Duration.ofSeconds(5);
+    private static final UserJsonDomainMapper mapper = Mappers.getMapper(UserJsonDomainMapper.class);
 
     @Context
     MeetMeThereSession session;
@@ -50,39 +46,19 @@ public class UsersResourceProvider implements UsersResource {
     @GET
     @Path("/{id}")
     public UserResource getUserById(@PathParam(ID) Long id) {
-        final UserModel user = session.eventBus()
-                .<UserModel>request(UserService.USER_GET_USER_EVENT, id)
-                .onItem()
-                .transform(Message::body)
-                .await()
-                .atMost(MAX_WAITING_TIME);
-
-        return new UserResourceProvider(session, user);
+        return new UserResourceProvider(session, id);
     }
 
     @GET
     @Path("/{username}")
-    public UserResource getUserByUsername(@PathParam("username") String username) {
-        final UserModel user = session.eventBus()
-                .<UserModel>request(UserService.USER_GET_USERNAME_EVENT, username)
-                .onItem()
-                .transform(Message::body)
-                .await()
-                .atMost(MAX_WAITING_TIME);
-
-        return new UserResourceProvider(session, user);
+    public Uni<UserJson> getUserByUsername(@PathParam("username") String username) {
+        return getSingleUser(session.eventBus(), UserService.USER_GET_USERNAME_EVENT, username);
     }
 
+    @GET
     @Path("/email/{email}")
-    public UserResource getUserByEmail(@PathParam("email") String email) {
-        final UserModel user = session.eventBus()
-                .<UserModel>request(UserService.USER_GET_EMAIL_EVENT, email)
-                .onItem()
-                .transform(Message::body)
-                .await()
-                .atMost(MAX_WAITING_TIME);
-
-        return new UserResourceProvider(session, user);
+    public Uni<UserJson> getUserByEmail(@PathParam("email") String email) {
+        return getSingleUser(session.eventBus(), UserService.USER_GET_EMAIL_EVENT, email);
     }
 
     @GET
@@ -101,34 +77,15 @@ public class UsersResourceProvider implements UsersResource {
     }
 
     @POST
-    public void createUser(UserJson user) {
-        User newUser = new User(user.getUsername(), user.getEmail());
-
-        //Workaround for now, because there's no codec for inherited UserJson and User POJO
-        newUser.setFirstName(user.getFirstName());
-        newUser.setLastName(user.getLastName());
-        newUser.setAttributes(user.getAttributes());
-
-        session.eventBus().send(UserService.USER_CREATE_EVENT, newUser);
-
-       /* return getSingleUser(session.eventBus(), UserService.USER_CREATE_EVENT, newUser)
-                .onFailure(ModelDuplicateException.class)
-                .transform(f -> new WebApplicationException(f.getMessage(), 409));*/
+    public Uni<Long> createUser(UserJson user) {
+        return EventBusUtil.createEntity(session.eventBus(), UserService.USER_CREATE_EVENT, mapper.toDomain(user));
     }
 
     protected static Uni<UserJson> getSingleUser(EventBus bus, String address, Object object) {
-        return bus.<UserModel>request(address, object).onItem().transform(Message::body).map(ModelToJson::toJson);
+        return EventBusUtil.<UserModel>getSingleEntity(bus, address, object).map(ModelToJson::toJson);
     }
 
     protected static Uni<Set<UserJson>> getSetOfUsers(EventBus bus, String address, Object object) {
-        return bus.<UserModelSet>request(address, object)
-                .onItem()
-                .transform(Message::body)
-                .map(f -> f.getSet()
-                        .stream()
-                        .filter(Objects::nonNull)
-                        .map(ModelToJson::toJson)
-                        .collect(Collectors.toSet())
-                );
+        return EventBusUtil.<UserModel, UserJson>getSetOfEntities(bus, address, object, ModelToJson::toJson);
     }
 }
