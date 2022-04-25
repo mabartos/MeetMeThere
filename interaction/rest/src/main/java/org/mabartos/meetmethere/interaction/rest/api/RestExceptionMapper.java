@@ -9,9 +9,11 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
+import java.util.logging.Logger;
 
 @Provider
 public class RestExceptionMapper implements ExceptionMapper<Throwable> {
+    private static final Logger log = Logger.getLogger(RestExceptionMapper.class.getName());
 
     @Override
     public Response toResponse(Throwable exception) {
@@ -41,6 +43,10 @@ public class RestExceptionMapper implements ExceptionMapper<Throwable> {
 
         if (throwable instanceof ModelDuplicateException) {
             status = Response.Status.CONFLICT.getStatusCode();
+        }
+
+        if (status == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
+            throwable.printStackTrace();
         }
 
         return status;

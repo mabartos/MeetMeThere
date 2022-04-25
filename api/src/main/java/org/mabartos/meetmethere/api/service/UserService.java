@@ -5,7 +5,7 @@ import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.eventbus.EmailUsernameObject;
 import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
-import org.mabartos.meetmethere.api.model.eventbus.UserModelSet;
+import org.mabartos.meetmethere.api.model.eventbus.UserSet;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
 
@@ -20,13 +20,13 @@ public interface UserService {
     String USER_GET_EMAIL_EVENT = "userGetByEmailEvent";
     String USER_COUNT_EVENT = "userCountEvent";
 
-    Uni<UserModel> getUserById(Long id);
+    Uni<User> getUserById(Long id);
 
-    Uni<UserModel> getUserByUsername(String username);
+    Uni<User> getUserByUsername(String username);
 
-    Uni<UserModel> getUserByEmail(String email);
+    Uni<User> getUserByEmail(String email);
 
-    Uni<UserModelSet> getUsers(PaginationObject paginationObject);
+    Uni<UserSet> getUsers(PaginationObject paginationObject);
 
     Uni<Long> getUsersCount(Object ignore);
 

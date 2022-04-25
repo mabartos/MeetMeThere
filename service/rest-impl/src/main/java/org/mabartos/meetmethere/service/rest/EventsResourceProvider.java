@@ -3,17 +3,16 @@ package org.mabartos.meetmethere.service.rest;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
+import org.mabartos.meetmethere.api.domain.Event;
 import org.mabartos.meetmethere.api.model.Coordinates;
-import org.mabartos.meetmethere.api.model.EventModel;
-import org.mabartos.meetmethere.api.model.eventbus.EventModelSet;
 import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
 import org.mabartos.meetmethere.api.service.EventService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.EventResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventsResource;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
-import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
 import org.mabartos.meetmethere.interaction.rest.api.model.mapper.EventJsonDomainMapper;
+import org.mabartos.meetmethere.service.rest.util.EventBusUtil;
 import org.mapstruct.factory.Mappers;
 
 import javax.enterprise.context.RequestScoped;
@@ -28,9 +27,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
@@ -42,7 +39,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @RequestScoped
 @Transactional
 public class EventsResourceProvider implements EventsResource {
-    private final EventJsonDomainMapper mapper = Mappers.getMapper(EventJsonDomainMapper.class);
+    private static final EventJsonDomainMapper mapper = Mappers.getMapper(EventJsonDomainMapper.class);
 
     @Context
     MeetMeThereSession session;
@@ -86,18 +83,10 @@ public class EventsResourceProvider implements EventsResource {
     }
 
     protected static Uni<EventJson> getSingleEvent(EventBus bus, String address, Object object) {
-        return bus.<EventModel>request(address, object).onItem().transform(Message::body).map(ModelToJson::toJson);
+        return EventBusUtil.<Event>getSingleEntity(bus, address, object).map(mapper::toJson);
     }
 
     protected static Uni<Set<EventJson>> getSetOfEvents(EventBus bus, String address, Object object) {
-        return bus.<EventModelSet>request(address, object)
-                .onItem()
-                .transform(Message::body)
-                .map(f -> f.getSet()
-                        .stream()
-                        .filter(Objects::nonNull)
-                        .map(ModelToJson::toJson)
-                        .collect(Collectors.toSet())
-                );
+        return EventBusUtil.getSetOfEntities(bus, address, object, mapper::toJson);
     }
 }

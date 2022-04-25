@@ -2,13 +2,12 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
-import org.mabartos.meetmethere.api.model.UserModel;
+import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
 import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
 import org.mabartos.meetmethere.interaction.rest.api.UsersResource;
-import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
 import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
 import org.mabartos.meetmethere.interaction.rest.api.model.mapper.UserJsonDomainMapper;
 import org.mabartos.meetmethere.service.rest.util.EventBusUtil;
@@ -26,7 +25,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
@@ -82,10 +80,10 @@ public class UsersResourceProvider implements UsersResource {
     }
 
     protected static Uni<UserJson> getSingleUser(EventBus bus, String address, Object object) {
-        return EventBusUtil.<UserModel>getSingleEntity(bus, address, object).map(ModelToJson::toJson);
+        return EventBusUtil.<User>getSingleEntity(bus, address, object).map(mapper::toJson);
     }
 
     protected static Uni<Set<UserJson>> getSetOfUsers(EventBus bus, String address, Object object) {
-        return EventBusUtil.<UserModel, UserJson>getSetOfEntities(bus, address, object, ModelToJson::toJson);
+        return EventBusUtil.getSetOfEntities(bus, address, object, mapper::toJson);
     }
 }

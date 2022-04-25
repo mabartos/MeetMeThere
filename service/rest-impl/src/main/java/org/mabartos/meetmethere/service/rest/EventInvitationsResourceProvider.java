@@ -20,7 +20,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import static org.mabartos.meetmethere.api.model.ModelUpdater.updateModel;
-import static org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson.toJson;
+import static org.mabartos.meetmethere.api.mapper.ModelToDomain.toDomain;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;

@@ -3,8 +3,7 @@ package org.mabartos.meetmethere.api.service;
 import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.api.domain.Event;
 import org.mabartos.meetmethere.api.model.Coordinates;
-import org.mabartos.meetmethere.api.model.EventModel;
-import org.mabartos.meetmethere.api.model.eventbus.EventModelSet;
+import org.mabartos.meetmethere.api.model.eventbus.EventSet;
 import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
@@ -21,15 +20,15 @@ public interface EventService {
 
     Uni<Long> createEvent(Event event) throws ModelDuplicateException;
 
-    Uni<EventModel> updateEvent(Event event) throws ModelNotFoundException;
+    Uni<Event> updateEvent(Event event) throws ModelNotFoundException;
 
-    Uni<EventModelSet> getEvents(PaginationObject paginationObject);
+    Uni<EventSet> getEvents(PaginationObject paginationObject);
 
-    Uni<EventModelSet> searchEventsByTitle(String title);
+    Uni<EventSet> searchEventsByTitle(String title);
 
-    Uni<EventModelSet> searchEventsByCoordinates(Coordinates coordinates);
+    Uni<EventSet> searchEventsByCoordinates(Coordinates coordinates);
 
-    Uni<EventModel> getEvent(Long id);
+    Uni<Event> getEvent(Long id);
 
     Uni<Long> getEventsCount(Object ignore);
 

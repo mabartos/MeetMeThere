@@ -34,9 +34,7 @@ public class EventBusUtil {
                 .transform(Message::body)
                 .onItem()
                 .ifNull()
-                .failWith(NotFoundException::new)
-                .onFailure(t -> !isTypeOfException(t, WebApplicationException.class))
-                .transform(t -> new BadRequestException(t.getMessage()));
+                .failWith(NotFoundException::new);
     }
 
     public static <Original, Converted> Uni<Set<Converted>> getSetOfEntities(

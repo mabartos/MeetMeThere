@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.quarkus.test.TestTransaction;
 import io.quarkus.test.junit.QuarkusTest;
 import org.junit.jupiter.api.Test;
+import org.mabartos.meetmethere.api.domain.User;
+import org.mabartos.meetmethere.api.mapper.ModelToDomain;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
-import org.mabartos.meetmethere.interaction.rest.api.model.ModelToJson;
-import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
 
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
@@ -41,7 +41,7 @@ public class EventsResourceTest {
 
     @Test
     public void createEvent() throws ModelDuplicateException, JsonProcessingException {
-        UserJson dto = ModelToJson.toJson(session.userStorage().createUser("email@test", "username"));
+        User dto = ModelToDomain.toDomain(session.userStorage().createUser("email@test", "username"));
         assertThat(dto, notNullValue());
 
         final UserModel found = session.userStorage().getUserById(dto.getId());
