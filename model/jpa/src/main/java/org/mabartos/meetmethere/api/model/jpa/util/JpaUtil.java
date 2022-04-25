@@ -19,7 +19,7 @@ public class JpaUtil {
         try {
             return Optional.of(supplier.get());
         } catch (Throwable e) {
-            if (e.getClass().isAssignableFrom(clazz)) {
+            if (clazz.isAssignableFrom(e.getClass())) {
                 return Optional.empty();
             } else throw e;
         }
@@ -30,7 +30,7 @@ public class JpaUtil {
     V convertToEntity(U model, EntityManager em, Class<T> adapterClass, Class<V> entityClass) {
         if (model == null || adapterClass == null || entityClass == null) return null;
 
-        if (model.getClass().isAssignableFrom(adapterClass)) {
+        if (adapterClass.isAssignableFrom(model.getClass())) {
             return (V) adapterClass.cast(model).getEntity();
         } else {
             return catchNoResult(() -> em.find(entityClass, model.getId())).orElse(null);

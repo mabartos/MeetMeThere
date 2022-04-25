@@ -31,8 +31,7 @@ public class DefaultUserService implements UserService {
     @Override
     @ConsumeEvent(value = USER_GET_USER_EVENT, blocking = true)
     public Uni<UserModel> getUserById(Long id) {
-        final UserModel model = session.userStorage().getUserById(id);
-        return model == null ? Uni.createFrom().failure(new ModelNotFoundException()) : Uni.createFrom().item(model);
+        return Uni.createFrom().item(session.userStorage().getUserById(id));
     }
 
     @Override

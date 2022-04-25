@@ -2,7 +2,7 @@ package org.mabartos.meetmethere.interaction.rest.api;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.api.domain.EventInvitation;
+import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventInvitationJson;
 
 import javax.transaction.Transactional;
@@ -24,6 +24,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
+@Tag(name = "Event Invitations Resource API", description = "Provide API for all invitations to event.")
 public interface EventInvitationsResource {
 
     @GET
