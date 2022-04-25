@@ -35,7 +35,7 @@ public class EventBusUtil {
                 .onItem()
                 .ifNull()
                 .failWith(NotFoundException::new)
-                .onFailure()
+                .onFailure(t -> !isTypeOfException(t, WebApplicationException.class))
                 .transform(t -> new BadRequestException(t.getMessage()));
     }
 
