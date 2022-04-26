@@ -1,9 +1,10 @@
 package org.mabartos.meetmethere.api.domain;
 
+
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -11,7 +12,8 @@ import java.util.Set;
 
 @Getter
 @Setter
-public class User implements Serializable {
+@Data
+public class User {
 
     private Long id;
 

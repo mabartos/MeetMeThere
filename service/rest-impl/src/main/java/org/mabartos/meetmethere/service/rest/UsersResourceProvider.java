@@ -41,14 +41,13 @@ public class UsersResourceProvider implements UsersResource {
     @Context
     MeetMeThereSession session;
 
-    @GET
     @Path("/{id}")
     public UserResource getUserById(@PathParam(ID) Long id) {
         return new UserResourceProvider(session, id);
     }
 
     @GET
-    @Path("/{username}")
+    @Path("/username/{username}")
     public Uni<UserJson> getUserByUsername(@PathParam("username") String username) {
         return getSingleUser(session.eventBus(), UserService.USER_GET_USERNAME_EVENT, username);
     }

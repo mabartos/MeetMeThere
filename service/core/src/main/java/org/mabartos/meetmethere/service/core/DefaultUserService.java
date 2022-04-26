@@ -33,30 +33,36 @@ public class DefaultUserService implements UserService {
 
     @Override
     @ConsumeEvent(value = USER_GET_USER_EVENT, blocking = true)
-    public Uni<User> getUserById(Long id) {
+    public Uni<User> getUserById(Long id) throws ModelNotFoundException {
         final UserModel model = session.userStorage().getUserById(id);
-        if (model == null) return null;
+        if (model == null) throw new ModelNotFoundException();
 
         return Uni.createFrom()
-                .item(session.userStorage().getUserById(id))
+                .item(model)
                 .onItem()
                 .transform(ModelToDomain::toDomain);
     }
 
     @Override
     @ConsumeEvent(value = USER_GET_USERNAME_EVENT, blocking = true)
-    public Uni<User> getUserByUsername(String username) {
+    public Uni<User> getUserByUsername(String username) throws ModelNotFoundException {
+        final UserModel model = session.userStorage().getUserByUsername(username);
+        if (model == null) throw new ModelNotFoundException();
+
         return Uni.createFrom()
-                .item(session.userStorage().getUserByUsername(username))
+                .item(model)
                 .onItem()
                 .transform(ModelToDomain::toDomain);
     }
 
     @Override
     @ConsumeEvent(value = USER_GET_EMAIL_EVENT, blocking = true)
-    public Uni<User> getUserByEmail(String email) {
+    public Uni<User> getUserByEmail(String email) throws ModelNotFoundException {
+        final UserModel model = session.userStorage().getUserByEmail(email);
+        if (model == null) throw new ModelNotFoundException();
+
         return Uni.createFrom()
-                .item(session.userStorage().getUserByEmail(email))
+                .item(model)
                 .onItem()
                 .transform(ModelToDomain::toDomain);
     }

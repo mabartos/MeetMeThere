@@ -18,6 +18,8 @@ import static org.mabartos.meetmethere.api.UpdateUtil.update;
 public class ModelToDomain {
 
     public static User toDomain(UserModel model) {
+        if (model == null) return null;
+
         User user = new User(model.getUsername(), model.getEmail());
         update(user::setId, model::getId);
         update(user::setFirstName, model::getFirstName);
@@ -27,6 +29,8 @@ public class ModelToDomain {
     }
 
     public static Event toDomain(EventModel model) {
+        if (model == null) return null;
+
         Event event = new Event(model.getEventTitle(),
                 model.getCreatedBy().getId(),
                 String.format("%s %s", model.getCreatedBy().getFirstName(), model.getCreatedBy().getLastName())
@@ -55,6 +59,8 @@ public class ModelToDomain {
     }
 
     public static Address toDomain(AddressModel model) {
+        if (model == null) return null;
+
         Address address = new Address(model.getCountry());
         update(address::setCity, model::getCity);
         update(address::setZipCode, model::getZipCode);
@@ -68,6 +74,8 @@ public class ModelToDomain {
     }
 
     public static EventInvitation toDomain(InvitationModel model) {
+        if (model == null) return null;
+
         EventInvitation eventInvitation = new EventInvitation(toDomain(model.getEvent()), toDomain(model.getSender()), toDomain(model.getReceiver()));
         update(eventInvitation::setId, model::getId);
         update(eventInvitation::setResponseType, model::getResponseType);

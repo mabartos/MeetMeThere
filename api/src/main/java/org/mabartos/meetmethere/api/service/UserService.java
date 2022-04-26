@@ -20,11 +20,11 @@ public interface UserService {
     String USER_GET_EMAIL_EVENT = "userGetByEmailEvent";
     String USER_COUNT_EVENT = "userCountEvent";
 
-    Uni<User> getUserById(Long id);
+    Uni<User> getUserById(Long id) throws ModelNotFoundException;
 
-    Uni<User> getUserByUsername(String username);
+    Uni<User> getUserByUsername(String username) throws ModelNotFoundException;
 
-    Uni<User> getUserByEmail(String email);
+    Uni<User> getUserByEmail(String email) throws ModelNotFoundException;
 
     Uni<UserSet> getUsers(PaginationObject paginationObject);
 

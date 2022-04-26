@@ -5,6 +5,7 @@ import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
 import org.mabartos.meetmethere.api.codecs.SetHolder;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
+import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
 
 import javax.ws.rs.BadRequestException;
 import javax.ws.rs.NotFoundException;
@@ -32,9 +33,10 @@ public class EventBusUtil {
         return bus.<T>request(address, object)
                 .onItem()
                 .transform(Message::body)
-                .onItem()
-                .ifNull()
-                .failWith(NotFoundException::new);
+                .onFailure(isNotFound -> isTypeOfException(isNotFound, ModelNotFoundException.class))
+                .transform(NotFoundException::new)
+                .onFailure(isOther -> !isTypeOfException(isOther, ModelNotFoundException.class)) //Workaround for failure handling
+                .transform(BadRequestException::new);
     }
 
     public static <Original, Converted> Uni<Set<Converted>> getSetOfEntities(

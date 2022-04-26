@@ -30,7 +30,7 @@ public interface UsersResource {
     UserResource getUserById(@PathParam(ID) Long id);
 
     @GET
-    @Path("/{username}")
+    @Path("/username/{username}")
     Uni<UserJson> getUserByUsername(@PathParam("username") String username);
 
     @GET
