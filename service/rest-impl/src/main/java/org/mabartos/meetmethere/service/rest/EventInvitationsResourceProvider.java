@@ -1,11 +1,17 @@
 package org.mabartos.meetmethere.service.rest;
 
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.interaction.rest.api.model.EventInvitationJson;
+import io.vertx.mutiny.core.eventbus.EventBus;
+import io.vertx.mutiny.core.eventbus.Message;
+import org.mabartos.meetmethere.api.domain.EventInvitation;
+import org.mabartos.meetmethere.api.service.EventInvitationService;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationsResource;
-import org.mabartos.meetmethere.api.session.MeetMeThereSession;
+import org.mabartos.meetmethere.interaction.rest.api.model.EventInvitationJson;
+import org.mabartos.meetmethere.interaction.rest.api.model.mapper.EventInvitationJsonDomainMapper;
+import org.mabartos.meetmethere.service.rest.util.EventBusUtil;
+import org.mapstruct.factory.Mappers;
 
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -15,20 +21,17 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Set;
 
-import static org.mabartos.meetmethere.api.model.ModelUpdater.updateModel;
-import static org.mabartos.meetmethere.api.mapper.ModelToDomain.toDomain;
-import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
-import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;
 
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
 public class EventInvitationsResourceProvider implements EventInvitationsResource {
+    private static final EventInvitationJsonDomainMapper mapper = Mappers.getMapper(EventInvitationJsonDomainMapper.class);
     private final MeetMeThereSession session;
     private final Long eventId;
 
@@ -38,76 +41,40 @@ public class EventInvitationsResourceProvider implements EventInvitationsResourc
     }
 
     @GET
-    public Multi<EventInvitationJson> getInvitations(@QueryParam(FIRST_RESULT) int firstResult,
-                                                     @QueryParam(MAX_RESULTS) int maxResults) {
-
-        return null;
-
-        /* return Multi.createFrom()
-                .items(session.invitations()
-                        .getInvitationsForEvent(eventId)
-                        .stream()
-                        .map(ModelToJson::toJson)
-                        .distinct()
-                        .toArray())
-                .onItem()
-                .castTo(EventInvitationJson.class);*/
+    public Uni<Set<EventInvitationJson>> getInvitations() {
+        return getSetOfEventInvitations(session.eventBus(), EventInvitationService.EVENT_INVITE_GET_MULTIPLE_EVENT, eventId);
     }
 
     @POST
-    public Uni<EventInvitationJson> createInvitation(EventInvitationJson invitation) {
-        return null;
-
-        /* if (session.invitations().getInvitationById(invitation.getId()) != null) {
-            throw new BadRequestException("Invitation already exist");
-        }
-
-        final UserModel sender = session.users().getUserById(invitation.getSenderId());
-        final UserModel receiver = session.users().getUserById(invitation.getReceiverId());
-
-        if (sender == null || receiver == null) throw new BadRequestException("Cannot find a particular users");
-
-        InvitationModel model = session.invitations().createInvitation(event, sender, receiver);
-
-        updateModel(invitation, model);
-
-        return Uni.createFrom().item(session.invitations().updateInvitation(model)).map(ModelToJson::toJson);
-   */
-    }
-
-    @POST
-    public Uni<EventInvitationJson> sendInvitation(Long receiverId) {
-        return null;
-
-        /* final UserModel sender = null; // TODO principal
-        final UserModel receiver = session.users().getUserById(receiverId);
-
-        return Uni.createFrom().item(toJson(session.invitations().createInvitation(event, sender, receiver)));
-   */
+    public Uni<Long> createInvitation(EventInvitationJson invitation) {
+        return EventBusUtil.createEntity(session.eventBus(), EventInvitationService.EVENT_INVITE_CREATE_EVENT, mapper.toDomain(invitation));
     }
 
     @DELETE
     public Response removeInvitations() {
-        /*try {
-            event.getInvitations().clear();
-        } catch (Exception e) {
-            return Response.status(400, "Cannot remove invitations").build();
-        }*/
+        session.eventBus().publish(EventInvitationService.EVENT_INVITE_REMOVE_MULTIPLE_EVENT, eventId);
         return Response.ok().build();
     }
 
     @Path("/{id}")
     public EventInvitationResource getInvitationById(@PathParam(ID) Long id) {
-        return null;
-      /*  final InvitationModel invitation = event.getInvitations().stream().filter(f -> f.getId().equals(id)).findFirst().orElse(null);
-        return new EventInvitationResourceProvider(session, invitation);
-    */
+        return new EventInvitationResourceProvider(session, id);
     }
 
-    @Override
+    @GET
+    @Path("/count")
     public Uni<Long> getInvitationsCount() {
-        return null;
-        // return Uni.createFrom().item(Integer.toUnsignedLong(event.getInvitations().size()));
+        return session.eventBus()
+                .<Long>request(EventInvitationService.EVENT_INVITE_COUNT_EVENT, eventId)
+                .onItem()
+                .transform(Message::body);
     }
 
+    protected static Uni<EventInvitationJson> getSingleEventInvitation(EventBus bus, String address, Object object) {
+        return EventBusUtil.<EventInvitation>getSingleEntity(bus, address, object).map(mapper::toJson);
+    }
+
+    protected static Uni<Set<EventInvitationJson>> getSetOfEventInvitations(EventBus bus, String address, Object object) {
+        return EventBusUtil.getSetOfEntities(bus, address, object, mapper::toJson);
+    }
 }

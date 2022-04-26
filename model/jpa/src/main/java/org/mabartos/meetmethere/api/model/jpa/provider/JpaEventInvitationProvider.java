@@ -59,9 +59,9 @@ public class JpaEventInvitationProvider implements InvitationProvider {
         }
 
         InvitationEntity entity = new InvitationEntity();
-        entity.setEvent(em.find(EventEntity.class, invitation.getEvent().getId()));
-        entity.setSender(em.find(UserEntity.class, invitation.getSender().getId()));
-        entity.setReceiver(em.find(UserEntity.class, invitation.getReceiver().getId()));
+        entity.setEvent(JpaEventAdapter.convertToEntity(invitation.getEvent(), em));
+        entity.setSender(JpaUserAdapter.convertToEntity(invitation.getSender(), em));
+        entity.setReceiver(JpaUserAdapter.convertToEntity(invitation.getReceiver(), em));
 
         convertInvitationStaticAttributes(entity, invitation);
 
@@ -72,12 +72,16 @@ public class JpaEventInvitationProvider implements InvitationProvider {
     }
 
     @Override
-    public InvitationModel createInvitation(EventModel event, UserModel sender, UserModel receiver) {
+    public InvitationModel createInvitation(EventModel event, UserModel sender, UserModel receiver, String message) {
         InvitationEntity entity = new InvitationEntity();
 
-        entity.setEvent(em.find(EventEntity.class, event.getId()));
-        entity.setSender(em.find(UserEntity.class, sender.getId()));
-        entity.setReceiver(em.find(UserEntity.class, receiver.getId()));
+        entity.setEvent(JpaEventAdapter.convertToEntity(event, em));
+        entity.setSender(JpaUserAdapter.convertToEntity(sender, em));
+        entity.setReceiver(JpaUserAdapter.convertToEntity(receiver, em));
+
+        if (message != null) {
+            entity.setMessage(message);
+        }
 
         em.persist(entity);
         em.flush();
@@ -85,9 +89,14 @@ public class JpaEventInvitationProvider implements InvitationProvider {
     }
 
     @Override
+    public InvitationModel createInvitation(EventModel event, UserModel sender, UserModel receiver) {
+        return createInvitation(event, sender, receiver, null);
+    }
+
+    @Override
     public void createInvitations(EventModel event, UserModel sender, Set<UserModel> receivers, String message) {
-        EventEntity eventEntity = em.find(EventEntity.class, event.getId());
-        UserEntity senderEntity = em.find(UserEntity.class, sender.getId());
+        EventEntity eventEntity = JpaEventAdapter.convertToEntity(event, em);
+        UserEntity senderEntity = JpaUserAdapter.convertToEntity(sender, em);
 
         if (eventEntity == null || senderEntity == null) {
             throw new IllegalArgumentException("Cannot create invitations");
@@ -98,7 +107,7 @@ public class JpaEventInvitationProvider implements InvitationProvider {
 
             entity.setEvent(eventEntity);
             entity.setSender(senderEntity);
-            entity.setReceiver(em.find(UserEntity.class, receiver.getId()));
+            entity.setReceiver(JpaUserAdapter.convertToEntity(receiver, em));
 
             em.persist(entity);
         }
@@ -132,6 +141,5 @@ public class JpaEventInvitationProvider implements InvitationProvider {
 
     private void convertInvitationStaticAttributes(InvitationEntity entity, InvitationModel model) {
         update(entity::setMessage, model::getMessage);
-        update(entity::setResponseType, model::getResponseType);
     }
 }

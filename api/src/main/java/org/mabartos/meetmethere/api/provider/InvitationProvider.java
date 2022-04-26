@@ -18,6 +18,8 @@ public interface InvitationProvider {
 
     InvitationModel createInvitation(EventModel event, UserModel sender, UserModel receiver);
 
+    InvitationModel createInvitation(EventModel event, UserModel sender, UserModel receiver, String message);
+
     void createInvitations(EventModel event, UserModel sender, Set<UserModel> receivers, String message);
 
     void removeInvitation(Long id) throws ModelNotFoundException;

@@ -33,7 +33,6 @@ public class ModelUpdater {
 
     public static void updateModel(EventInvitation invitation, InvitationModel model) {
         update(model::setMessage, invitation::getMessage);
-        update(model::setResponseType, invitation::getResponseType);
     }
 
     public static void updateModel(Address address, AddressModel model) {

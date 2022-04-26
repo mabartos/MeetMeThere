@@ -1,6 +1,5 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
-import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventInvitationJson;
@@ -16,6 +15,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Set;
 
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
@@ -28,14 +28,10 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 public interface EventInvitationsResource {
 
     @GET
-    Multi<EventInvitationJson> getInvitations(@QueryParam(FIRST_RESULT) int firstResult,
-                                              @QueryParam(MAX_RESULTS) int maxResults);
+    Uni<Set<EventInvitationJson>> getInvitations();
 
     @POST
-    Uni<EventInvitationJson> createInvitation(EventInvitationJson invitation);
-
-    @POST
-    Uni<EventInvitationJson> sendInvitation(Long receiverId);
+    Uni<Long> createInvitation(EventInvitationJson invitation);
 
     @DELETE
     Response removeInvitations();

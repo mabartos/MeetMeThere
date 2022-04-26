@@ -1,9 +1,6 @@
 package org.mabartos.meetmethere.api.model;
 
-import org.mabartos.meetmethere.api.enums.ResponseType;
-
 import java.time.LocalDateTime;
-import java.util.Map;
 import java.util.Set;
 
 public interface EventModel extends HasId<Long>, HasAttributes<String, String> {
@@ -50,7 +47,7 @@ public interface EventModel extends HasId<Long>, HasAttributes<String, String> {
 
     void setUpdatedBy(UserModel user);
 
-    Map<UserModel, ResponseType> getResponses();
+    //Map<UserModel, ResponseType> getResponses();
 
     Set<InvitationModel> getInvitations();
 }

@@ -78,7 +78,6 @@ public class ModelToDomain {
 
         EventInvitation eventInvitation = new EventInvitation(toDomain(model.getEvent()), toDomain(model.getSender()), toDomain(model.getReceiver()));
         update(eventInvitation::setId, model::getId);
-        update(eventInvitation::setResponseType, model::getResponseType);
         update(eventInvitation::setMessage, model::getMessage);
         return eventInvitation;
     }

@@ -1,7 +1,6 @@
 package org.mabartos.meetmethere.api.model.jpa.adapter;
 
 import io.smallrye.common.constraint.NotNull;
-import org.mabartos.meetmethere.api.enums.ResponseType;
 import org.mabartos.meetmethere.api.model.AddressModel;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.InvitationModel;
@@ -156,7 +155,7 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
         getEntity().setUpdatedBy(JpaUserAdapter.convertToEntity(user, em));
     }
 
-    @Override
+   /* @Override
     public Map<UserModel, ResponseType> getResponses() {
         final Map<UserModel, ResponseType> map = new HashMap<>();
 
@@ -164,7 +163,7 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
                 .forEach(f -> map.put(new JpaUserAdapter(session, em, f.getReceiver()), f.getResponseType()));
 
         return map;
-    }
+    }*/
 
     @Override
     public Set<InvitationModel> getInvitations() {

@@ -2,7 +2,6 @@ package org.mabartos.meetmethere.api.domain;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.mabartos.meetmethere.api.enums.ResponseType;
 
 import java.io.Serializable;
 
@@ -26,8 +25,6 @@ public class EventInvitation implements Serializable {
 
     private String message;
 
-    private ResponseType responseType;
-
     public EventInvitation(Event event, User sender, User receiver) {
         this.eventTitle = event.getTitle();
         this.eventId = event.getId();
@@ -35,7 +32,6 @@ public class EventInvitation implements Serializable {
         this.senderId = sender.getId();
         this.receiverName = receiver.getFullName();
         this.receiverId = receiver.getId();
-        this.responseType = ResponseType.NOT_ANSWERED;
     }
 
     public EventInvitation(Event event, User sender, User receiver, String message) {

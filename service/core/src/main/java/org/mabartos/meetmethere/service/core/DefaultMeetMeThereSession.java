@@ -10,6 +10,7 @@ import org.mabartos.meetmethere.api.model.jpa.provider.JpaUserProviderFactory;
 import org.mabartos.meetmethere.api.provider.EventProvider;
 import org.mabartos.meetmethere.api.provider.InvitationProvider;
 import org.mabartos.meetmethere.api.provider.UserProvider;
+import org.mabartos.meetmethere.api.service.EventInvitationService;
 import org.mabartos.meetmethere.api.service.EventService;
 import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
@@ -51,7 +52,12 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
     }
 
     @Override
-    public InvitationProvider invitations() {
+    public EventInvitationService invitations() {
+        return new DefaultEventInvitationService(this);
+    }
+
+    @Override
+    public InvitationProvider invitationStorage() {
         return new JpaEventInvitationProviderFactory().create(this);
     }
 

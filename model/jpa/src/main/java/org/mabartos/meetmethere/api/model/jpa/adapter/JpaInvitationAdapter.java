@@ -1,7 +1,6 @@
 package org.mabartos.meetmethere.api.model.jpa.adapter;
 
 import io.smallrye.common.constraint.NotNull;
-import org.mabartos.meetmethere.api.enums.ResponseType;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.InvitationModel;
 import org.mabartos.meetmethere.api.model.UserModel;
@@ -64,16 +63,6 @@ public class JpaInvitationAdapter implements InvitationModel, JpaModel<Invitatio
     @Override
     public void setReceiver(UserModel receiver) {
         getEntity().setReceiver(JpaUserAdapter.convertToEntity(receiver, em));
-    }
-
-    @Override
-    public ResponseType getResponseType() {
-        return getEntity().getResponseType();
-    }
-
-    @Override
-    public void setResponseType(ResponseType responseType) {
-        getEntity().setResponseType(responseType);
     }
 
     @Override
