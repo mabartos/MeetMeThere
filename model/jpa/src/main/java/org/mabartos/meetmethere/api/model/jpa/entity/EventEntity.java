@@ -72,7 +72,7 @@ public class EventEntity extends BaseEntity {
     @BatchSize(size = 20)
     private Set<InvitationEntity> invitations;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @BatchSize(size = 20)
     private Map<String, String> attributes = new HashMap<>();
 }

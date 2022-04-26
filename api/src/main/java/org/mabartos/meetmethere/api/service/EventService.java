@@ -6,7 +6,6 @@ import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.eventbus.EventSet;
 import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
-import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
 
 public interface EventService {
     String EVENT_CREATE_EVENT = "eventCreateEvent";
@@ -20,7 +19,7 @@ public interface EventService {
 
     Uni<Long> createEvent(Event event) throws ModelDuplicateException;
 
-    Uni<Event> updateEvent(Event event) throws ModelNotFoundException;
+    Uni<Event> updateEvent(Event event);
 
     Uni<EventSet> getEvents(PaginationObject paginationObject);
 
@@ -32,5 +31,5 @@ public interface EventService {
 
     Uni<Long> getEventsCount(Object ignore);
 
-    void removeEvent(Long eventId) throws ModelNotFoundException;
+    void removeEvent(Long eventId);
 }

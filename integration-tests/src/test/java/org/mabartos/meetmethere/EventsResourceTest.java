@@ -10,6 +10,7 @@ import org.mabartos.meetmethere.api.mapper.ModelToDomain;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
+import org.mabartos.meetmethere.interaction.rest.api.model.AddressJson;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
 
 import javax.inject.Inject;
@@ -49,7 +50,7 @@ public class EventsResourceTest {
         assertThat(found.getUsername(), is("username"));
         assertThat(found.getEmail(), is("email@test"));
 
-        EventJson event = new EventJson("New Event", dto.getId(), String.format("%s %s", dto.getFirstName(), dto.getLastName()));
+        EventJson event = new EventJson("New Event", dto.getId(), String.format("%s %s", dto.getFirstName(), dto.getLastName()), new AddressJson("Czech Republic"));
         given()
                 .when()
                 .body(mapper.writeValueAsString(event))

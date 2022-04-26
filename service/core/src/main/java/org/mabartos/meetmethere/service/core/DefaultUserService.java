@@ -102,7 +102,7 @@ public class DefaultUserService implements UserService {
 
     @Override
     @ConsumeEvent(value = USER_REMOVE_EVENT, blocking = true)
-    public void removeUser(Long id) throws ModelNotFoundException {
+    public void removeUser(Long id) {
         session.userStorage().removeUser(id);
     }
 

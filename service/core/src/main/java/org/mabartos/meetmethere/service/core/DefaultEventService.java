@@ -17,14 +17,16 @@ import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
+import javax.transaction.Transactional;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @ApplicationScoped
+@Transactional
 public class DefaultEventService implements EventService {
 
-    MeetMeThereSession session;
+    private final MeetMeThereSession session;
 
     @Inject
     public DefaultEventService(MeetMeThereSession session) {
@@ -39,6 +41,7 @@ public class DefaultEventService implements EventService {
         }
 
         final UserModel creator = session.userStorage().getUserById(event.getCreatedById());
+        if (creator == null) throw new ModelNotFoundException("Cannot find creator");
 
         EventModel model = session.eventStorage().createEvent(event.getTitle(), creator);
         ModelUpdater.updateModel(event, model);
@@ -100,8 +103,11 @@ public class DefaultEventService implements EventService {
     @Override
     @ConsumeEvent(value = EVENT_GET_EVENT_EVENT, blocking = true)
     public Uni<Event> getEvent(Long id) {
+        EventModel model = session.eventStorage().getEventById(id);
+        if (model == null) throw new ModelNotFoundException();
+
         return Uni.createFrom()
-                .item(session.eventStorage().getEventById(id))
+                .item(model)
                 .onItem()
                 .transform(ModelToDomain::toDomain);
     }

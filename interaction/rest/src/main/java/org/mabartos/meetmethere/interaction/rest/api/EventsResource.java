@@ -27,14 +27,14 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 public interface EventsResource {
 
     @GET
-    Uni<Set<EventJson>> getEvents(@QueryParam(FIRST_RESULT) int firstResult,
-                                  @QueryParam(MAX_RESULTS) int maxResults);
+    Uni<Set<EventJson>> getEvents(@QueryParam(FIRST_RESULT) Integer firstResult,
+                                  @QueryParam(MAX_RESULTS) Integer maxResults);
 
     @Path("/{id}")
     EventResource getEventById(@PathParam(ID) Long id);
 
     @GET
-    @Path("/{title}")
+    @Path("/title/{title}")
     Uni<Set<EventJson>> searchEventsByTitle(@PathParam("title") String title);
 
     @GET
@@ -43,7 +43,7 @@ public interface EventsResource {
                                                   @QueryParam("latitude") Double latitude);
 
     @POST
-    Uni<EventJson> createEvent(EventJson event);
+    Uni<Long> createEvent(EventJson event);
 
     @GET
     @Path("/count")

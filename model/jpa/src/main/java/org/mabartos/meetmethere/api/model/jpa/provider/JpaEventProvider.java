@@ -4,7 +4,6 @@ import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
-import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
 import org.mabartos.meetmethere.api.model.jpa.adapter.JpaAddressAdapter;
 import org.mabartos.meetmethere.api.model.jpa.adapter.JpaEventAdapter;
 import org.mabartos.meetmethere.api.model.jpa.adapter.JpaInvitationAdapter;
@@ -112,8 +111,8 @@ public class JpaEventProvider implements EventProvider {
     }
 
     @Override
-    public void removeEvent(Long id) throws ModelNotFoundException {
-        if (!EventEntity.deleteById(id)) throw new ModelNotFoundException("Cannot find Event");
+    public void removeEvent(Long id) {
+        EventEntity.deleteById(id);
     }
 
     @Override

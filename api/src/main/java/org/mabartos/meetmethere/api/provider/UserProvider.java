@@ -22,7 +22,7 @@ public interface UserProvider {
 
     UserModel createUser(UserModel user) throws ModelDuplicateException;
 
-    void removeUser(Long id) throws ModelNotFoundException;
+    void removeUser(Long id);
 
     UserModel updateUser(UserModel user);
 }

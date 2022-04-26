@@ -2,7 +2,6 @@ package org.mabartos.meetmethere.api.model.jpa.provider;
 
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
-import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
 import org.mabartos.meetmethere.api.model.jpa.adapter.JpaEventAdapter;
 import org.mabartos.meetmethere.api.model.jpa.adapter.JpaUserAdapter;
 import org.mabartos.meetmethere.api.model.jpa.entity.UserEntity;
@@ -113,8 +112,8 @@ public class JpaUserProvider implements UserProvider {
     }
 
     @Override
-    public void removeUser(Long id) throws ModelNotFoundException {
-        if (!UserEntity.deleteById(id)) throw new ModelNotFoundException("Cannot find User");
+    public void removeUser(Long id) {
+        UserEntity.deleteById(id);
     }
 
     @Override

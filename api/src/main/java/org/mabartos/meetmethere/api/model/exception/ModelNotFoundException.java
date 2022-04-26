@@ -1,6 +1,6 @@
 package org.mabartos.meetmethere.api.model.exception;
 
-public class ModelNotFoundException extends Exception {
+public class ModelNotFoundException extends RuntimeException {
 
     public ModelNotFoundException() {
         super();

@@ -45,7 +45,10 @@ public class EventsResourceProvider implements EventsResource {
     MeetMeThereSession session;
 
     @GET
-    public Uni<Set<EventJson>> getEvents(@QueryParam(FIRST_RESULT) int firstResult, @QueryParam(MAX_RESULTS) int maxResults) {
+    public Uni<Set<EventJson>> getEvents(@QueryParam(FIRST_RESULT) Integer firstResult, @QueryParam(MAX_RESULTS) Integer maxResults) {
+        firstResult = firstResult != null ? firstResult : 0;
+        maxResults = maxResults != null ? maxResults : Integer.MAX_VALUE;
+
         return getSetOfEvents(session.eventBus(), EventService.EVENT_GET_EVENTS_EVENT, new PaginationObject(firstResult, maxResults));
     }
 
@@ -55,7 +58,7 @@ public class EventsResourceProvider implements EventsResource {
     }
 
     @GET
-    @Path("/{title}")
+    @Path("/title/{title}")
     public Uni<Set<EventJson>> searchEventsByTitle(@PathParam("title") String title) {
         return getSetOfEvents(session.eventBus(), EventService.EVENT_SEARCH_TITLE_EVENT, title);
     }
@@ -72,8 +75,8 @@ public class EventsResourceProvider implements EventsResource {
     }
 
     @POST
-    public Uni<EventJson> createEvent(EventJson event) {
-        return getSingleEvent(session.eventBus(), EventService.EVENT_CREATE_EVENT, mapper.toDomain(event));
+    public Uni<Long> createEvent(EventJson event) {
+        return EventBusUtil.createEntity(session.eventBus(), EventService.EVENT_CREATE_EVENT, mapper.toDomain(event));
     }
 
     @GET
