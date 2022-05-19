@@ -18,6 +18,12 @@
             <artifactId>jpa</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.mabartos.meetmethere</groupId>
+            <artifactId>caffeine</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
     <properties>

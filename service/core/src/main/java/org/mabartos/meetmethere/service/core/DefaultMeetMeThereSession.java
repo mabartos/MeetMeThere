@@ -4,9 +4,6 @@ package org.mabartos.meetmethere.service.core;
 import org.mabartos.meetmethere.api.model.jpa.provider.JpaEventProvider;*/
 
 import io.vertx.mutiny.core.eventbus.EventBus;
-import org.mabartos.meetmethere.model.jpa.provider.JpaEventInvitationProviderFactory;
-import org.mabartos.meetmethere.model.jpa.provider.JpaEventProviderFactory;
-import org.mabartos.meetmethere.model.jpa.provider.JpaUserProviderFactory;
 import org.mabartos.meetmethere.api.provider.EventProvider;
 import org.mabartos.meetmethere.api.provider.InvitationProvider;
 import org.mabartos.meetmethere.api.provider.UserProvider;
@@ -14,6 +11,9 @@ import org.mabartos.meetmethere.api.service.EventInvitationService;
 import org.mabartos.meetmethere.api.service.EventService;
 import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
+import org.mabartos.meetmethere.model.jpa.provider.JpaEventInvitationProviderFactory;
+import org.mabartos.meetmethere.service.core.store.DefaultEventStoreFactory;
+import org.mabartos.meetmethere.service.core.store.DefaultUserStoreFactory;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -38,7 +38,7 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
 
     @Override
     public UserProvider userStorage() {
-        return new JpaUserProviderFactory().create(this);
+        return new DefaultUserStoreFactory().create(this);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
 
     @Override
     public EventProvider eventStorage() {
-        return new JpaEventProviderFactory().create(this);
+        return new DefaultEventStoreFactory().create(this);
     }
 
     @Override
