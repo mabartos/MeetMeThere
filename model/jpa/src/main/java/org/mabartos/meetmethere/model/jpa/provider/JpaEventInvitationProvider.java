@@ -1,16 +1,16 @@
-package org.mabartos.meetmethere.api.model.jpa.provider;
+package org.mabartos.meetmethere.model.jpa.provider;
 
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.InvitationModel;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
-import org.mabartos.meetmethere.api.model.jpa.adapter.JpaEventAdapter;
-import org.mabartos.meetmethere.api.model.jpa.adapter.JpaInvitationAdapter;
-import org.mabartos.meetmethere.api.model.jpa.adapter.JpaUserAdapter;
-import org.mabartos.meetmethere.api.model.jpa.entity.EventEntity;
-import org.mabartos.meetmethere.api.model.jpa.entity.InvitationEntity;
-import org.mabartos.meetmethere.api.model.jpa.entity.UserEntity;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaEventAdapter;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaInvitationAdapter;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaUserAdapter;
+import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
+import org.mabartos.meetmethere.model.jpa.entity.InvitationEntity;
+import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.api.provider.InvitationProvider;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 

@@ -1,4 +1,4 @@
-package org.mabartos.meetmethere.api.model.jpa.provider;
+package org.mabartos.meetmethere.model.jpa.provider;
 
 import org.mabartos.meetmethere.api.provider.InvitationProvider;
 import org.mabartos.meetmethere.api.provider.ProviderFactory;

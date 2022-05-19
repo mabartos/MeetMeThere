@@ -1,16 +1,17 @@
-package org.mabartos.meetmethere.api.model.jpa.provider;
+package org.mabartos.meetmethere.model.jpa.provider;
 
 import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
-import org.mabartos.meetmethere.api.model.jpa.adapter.JpaAddressAdapter;
-import org.mabartos.meetmethere.api.model.jpa.adapter.JpaEventAdapter;
-import org.mabartos.meetmethere.api.model.jpa.adapter.JpaInvitationAdapter;
-import org.mabartos.meetmethere.api.model.jpa.adapter.JpaUserAdapter;
-import org.mabartos.meetmethere.api.model.jpa.entity.EventEntity;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaAddressAdapter;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaEventAdapter;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaInvitationAdapter;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaUserAdapter;
+import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.api.provider.EventProvider;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
+import org.mabartos.meetmethere.model.jpa.util.JpaUtil;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -21,7 +22,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.mabartos.meetmethere.api.UpdateUtil.update;
-import static org.mabartos.meetmethere.api.model.jpa.util.JpaUtil.catchNoResult;
 
 @Transactional
 public class JpaEventProvider implements EventProvider {
@@ -43,7 +43,7 @@ public class JpaEventProvider implements EventProvider {
 
     @Override
     public Set<EventModel> searchByTitle(String title) {
-        final Optional<List<EventEntity>> events = catchNoResult(() -> em.createQuery("select e from EventEntity e where e.title like :title", EventEntity.class)
+        final Optional<List<EventEntity>> events = JpaUtil.catchNoResult(() -> em.createQuery("select e from EventEntity e where e.title like :title", EventEntity.class)
                 .setParameter("title", title)
                 .getResultList()
         );
@@ -55,7 +55,7 @@ public class JpaEventProvider implements EventProvider {
 
     @Override
     public Set<EventModel> searchByCoordinates(Coordinates coordinates) {
-        final Optional<List<EventEntity>> events = catchNoResult(() ->
+        final Optional<List<EventEntity>> events = JpaUtil.catchNoResult(() ->
                 em.createQuery("select e from EventEntity e where e.venue.longitude=:longitude and e.venue.latitude =:latitude", EventEntity.class)
                         .setParameter("longitude", coordinates.getLongitude())
                         .setParameter("latitude", coordinates.getLatitude())
@@ -69,7 +69,7 @@ public class JpaEventProvider implements EventProvider {
 
     @Override
     public Set<EventModel> getEvents(int firstResult, int maxResults) {
-        final Optional<List<EventEntity>> events = catchNoResult(() -> em.createQuery("select e from EventEntity e", EventEntity.class)
+        final Optional<List<EventEntity>> events = JpaUtil.catchNoResult(() -> em.createQuery("select e from EventEntity e", EventEntity.class)
                 .setFirstResult(firstResult)
                 .setMaxResults(maxResults)
                 .getResultList()

@@ -25,6 +25,8 @@ public class EventInvitation implements Serializable {
 
     private String message;
 
+    public EventInvitation(){}
+
     public EventInvitation(Event event, User sender, User receiver) {
         this.eventTitle = event.getTitle();
         this.eventId = event.getId();

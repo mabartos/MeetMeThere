@@ -1,8 +1,8 @@
-package org.mabartos.meetmethere.api.model.jpa.util;
+package org.mabartos.meetmethere.model.jpa.util;
 
 import org.mabartos.meetmethere.api.model.HasId;
-import org.mabartos.meetmethere.api.model.jpa.JpaModel;
-import org.mabartos.meetmethere.api.model.jpa.entity.BaseEntity;
+import org.mabartos.meetmethere.model.jpa.JpaModel;
+import org.mabartos.meetmethere.model.jpa.entity.BaseEntity;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;

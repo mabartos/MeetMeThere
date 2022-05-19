@@ -1,10 +1,10 @@
-package org.mabartos.meetmethere.api.model.jpa.provider;
+package org.mabartos.meetmethere.model.jpa.provider;
 
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
-import org.mabartos.meetmethere.api.model.jpa.adapter.JpaEventAdapter;
-import org.mabartos.meetmethere.api.model.jpa.adapter.JpaUserAdapter;
-import org.mabartos.meetmethere.api.model.jpa.entity.UserEntity;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaEventAdapter;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaUserAdapter;
+import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.api.provider.UserProvider;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.mabartos.meetmethere.api.UpdateUtil.update;
-import static org.mabartos.meetmethere.api.model.jpa.util.JpaUtil.catchNoResult;
+import static org.mabartos.meetmethere.model.jpa.util.JpaUtil.catchNoResult;
 
 @Transactional
 public class JpaUserProvider implements UserProvider {

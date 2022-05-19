@@ -1,4 +1,4 @@
-package org.mabartos.meetmethere.api.model.jpa.entity;
+package org.mabartos.meetmethere.model.jpa.entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import javax.persistence.GeneratedValue;

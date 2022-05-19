@@ -1,4 +1,4 @@
-package org.mabartos.meetmethere.api.model.jpa.entity;
+package org.mabartos.meetmethere.model.jpa.entity;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;

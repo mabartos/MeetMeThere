@@ -1,12 +1,12 @@
-package org.mabartos.meetmethere.api.model.jpa.adapter;
+package org.mabartos.meetmethere.model.jpa.adapter;
 
 import io.smallrye.common.constraint.NotNull;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.InvitationModel;
 import org.mabartos.meetmethere.api.model.UserModel;
-import org.mabartos.meetmethere.api.model.jpa.JpaModel;
-import org.mabartos.meetmethere.api.model.jpa.entity.InvitationEntity;
-import org.mabartos.meetmethere.api.model.jpa.util.JpaUtil;
+import org.mabartos.meetmethere.model.jpa.JpaModel;
+import org.mabartos.meetmethere.model.jpa.entity.InvitationEntity;
+import org.mabartos.meetmethere.model.jpa.util.JpaUtil;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.persistence.EntityManager;

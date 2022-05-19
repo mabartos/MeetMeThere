@@ -1,9 +1,9 @@
-package org.mabartos.meetmethere.api.model.jpa.adapter;
+package org.mabartos.meetmethere.model.jpa.adapter;
 
 import io.smallrye.common.constraint.NotNull;
 import org.mabartos.meetmethere.api.model.AddressModel;
 import org.mabartos.meetmethere.api.model.Coordinates;
-import org.mabartos.meetmethere.api.model.jpa.entity.AddressEntity;
+import org.mabartos.meetmethere.model.jpa.entity.AddressEntity;
 
 import static org.mabartos.meetmethere.api.UpdateUtil.update;
 

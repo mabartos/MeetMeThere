@@ -9,6 +9,8 @@ import org.mabartos.meetmethere.api.domain.User;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class EventInvitationJson extends EventInvitation {
 
+    public EventInvitationJson(){}
+
     @JsonCreator
     public EventInvitationJson(Event event, User sender, User receiver) {
         super(event, sender, receiver);
