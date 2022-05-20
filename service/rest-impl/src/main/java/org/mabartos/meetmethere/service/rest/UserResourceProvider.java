@@ -1,7 +1,8 @@
 package org.mabartos.meetmethere.service.rest;
 
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheResult;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
 import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
@@ -37,6 +38,7 @@ public class UserResourceProvider implements UserResource {
     }
 
     @GET
+    @CacheResult(cacheName = UsersResourceProvider.CACHE_NAME)
     public Uni<UserJson> getUser() {
         return getSingleUser(session.eventBus(), USER_GET_USER_EVENT, userId);
     }
@@ -44,6 +46,7 @@ public class UserResourceProvider implements UserResource {
     @DELETE
     public Response removeUser() {
         session.eventBus().publish(USER_REMOVE_EVENT, userId);
+        invalidateById(userId);
         return Response.ok().build();
     }
 
@@ -54,6 +57,22 @@ public class UserResourceProvider implements UserResource {
         }
         user.setId(userId);
 
+        invalidateById(user.getId());
+        invalidateByName(user.getUsername());
+        invalidateByEmail(user.getEmail());
+
         return getSingleUser(session.eventBus(), USER_UPDATE_EVENT, mapper.toDomain(user));
+    }
+
+    @CacheInvalidate(cacheName = UsersResourceProvider.CACHE_NAME)
+    void invalidateById(Long id) {
+    }
+
+    @CacheInvalidate(cacheName = UsersResourceProvider.CACHE_NAME)
+    void invalidateByName(String username) {
+    }
+
+    @CacheInvalidate(cacheName = UsersResourceProvider.CACHE_NAME)
+    void invalidateByEmail(String email) {
     }
 }

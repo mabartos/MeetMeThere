@@ -1,5 +1,6 @@
 package org.mabartos.meetmethere.service.rest;
 
+import io.quarkus.cache.CacheResult;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import org.mabartos.meetmethere.api.domain.User;
@@ -40,28 +41,33 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Transactional
 public class UsersResourceProvider implements UsersResource {
     private static final UserJsonDomainMapper mapper = Mappers.getMapper(UserJsonDomainMapper.class);
+    static final String CACHE_NAME = "users-resource-provider-cache";
 
     @Context
     MeetMeThereSession session;
 
     @Path("/{id}")
+    @CacheResult(cacheName = CACHE_NAME)
     public UserResource getUserById(@PathParam(ID) Long id) {
         return new UserResourceProvider(session, id);
     }
 
     @GET
     @Path("/username/{username}")
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<UserJson> getUserByUsername(@PathParam("username") String username) {
         return getSingleUser(session.eventBus(), USER_GET_USERNAME_EVENT, username);
     }
 
     @GET
     @Path("/email/{email}")
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<UserJson> getUserByEmail(@PathParam("email") String email) {
         return getSingleUser(session.eventBus(), USER_GET_EMAIL_EVENT, email);
     }
 
     @GET
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<Set<UserJson>> getUsers(@QueryParam(FIRST_RESULT) Integer firstResult,
                                        @QueryParam(MAX_RESULTS) Integer maxResults) {
         firstResult = firstResult != null ? firstResult : 0;
@@ -72,6 +78,7 @@ public class UsersResourceProvider implements UsersResource {
 
     @GET
     @Path("/count")
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<Long> getUsersCount() {
         return Uni.createFrom().item(session.userStorage().getUsersCount());
     }

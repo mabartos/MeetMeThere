@@ -1,5 +1,7 @@
 package org.mabartos.meetmethere.service.rest;
 
+import io.quarkus.cache.CacheInvalidateAll;
+import io.quarkus.cache.CacheResult;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
@@ -35,6 +37,8 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
 public class EventInvitationsResourceProvider implements EventInvitationsResource {
+    static final String CACHE_NAME = "event-invitation-resource-provider-cache";
+
     private static final EventInvitationJsonDomainMapper mapper = Mappers.getMapper(EventInvitationJsonDomainMapper.class);
     private final MeetMeThereSession session;
     private final Long eventId;
@@ -45,6 +49,7 @@ public class EventInvitationsResourceProvider implements EventInvitationsResourc
     }
 
     @GET
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<Set<EventInvitationJson>> getInvitations() {
         return getSetOfEventInvitations(session.eventBus(), EVENT_INVITE_GET_MULTIPLE_EVENT, eventId);
     }
@@ -55,18 +60,21 @@ public class EventInvitationsResourceProvider implements EventInvitationsResourc
     }
 
     @DELETE
+    @CacheInvalidateAll(cacheName = CACHE_NAME)
     public Response removeInvitations() {
         session.eventBus().publish(EVENT_INVITE_REMOVE_MULTIPLE_EVENT, eventId);
         return Response.ok().build();
     }
 
     @Path("/{id}")
+    @CacheResult(cacheName = CACHE_NAME)
     public EventInvitationResource getInvitationById(@PathParam(ID) Long id) {
         return new EventInvitationResourceProvider(session, id);
     }
 
     @GET
     @Path("/count")
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<Long> getInvitationsCount() {
         return session.eventBus()
                 .<Long>request(EVENT_INVITE_COUNT_EVENT, eventId)

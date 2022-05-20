@@ -1,7 +1,8 @@
 package org.mabartos.meetmethere.service.rest;
 
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheResult;
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.api.service.EventService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationsResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventResource;
@@ -39,12 +40,14 @@ public class EventResourceProvider implements EventResource {
     }
 
     @GET
+    @CacheResult(cacheName = EventsResourceProvider.CACHE_NAME)
     public Uni<EventJson> getEvent() {
         return getSingleEvent(session.eventBus(), EVENT_GET_EVENT_EVENT, eventId);
     }
 
     @DELETE
     public Response removeEvent() {
+        invalidateById(eventId);
         session.eventBus().publish(EVENT_REMOVE_EVENT, eventId);
         return Response.ok().build();
     }
@@ -56,11 +59,24 @@ public class EventResourceProvider implements EventResource {
         }
         event.setId(eventId);
 
+        invalidateById(eventId);
+        invalidateByTitle(event.getTitle());
+
         return getSingleEvent(session.eventBus(), EVENT_UPDATE_EVENT, mapper.toDomain(event));
     }
 
     @Path("/invitations")
     public EventInvitationsResource getInvitations() {
         return new EventInvitationsResourceProvider(session, eventId);
+    }
+
+    @CacheInvalidate(cacheName = EventsResourceProvider.CACHE_NAME)
+    void invalidateById(Long id) {
+
+    }
+
+    @CacheInvalidate(cacheName = EventsResourceProvider.CACHE_NAME)
+    void invalidateByTitle(String title) {
+
     }
 }

@@ -1,5 +1,7 @@
 package org.mabartos.meetmethere.service.rest;
 
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheResult;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
@@ -44,11 +46,13 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Transactional
 public class EventsResourceProvider implements EventsResource {
     private static final EventJsonDomainMapper mapper = Mappers.getMapper(EventJsonDomainMapper.class);
+    static final String CACHE_NAME = "event-resource-provider-cache";
 
     @Context
     MeetMeThereSession session;
 
     @GET
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<Set<EventJson>> getEvents(@QueryParam(FIRST_RESULT) Integer firstResult, @QueryParam(MAX_RESULTS) Integer maxResults) {
         firstResult = firstResult != null ? firstResult : 0;
         maxResults = maxResults != null ? maxResults : Integer.MAX_VALUE;
@@ -57,18 +61,21 @@ public class EventsResourceProvider implements EventsResource {
     }
 
     @Path("/{id}")
+    @CacheResult(cacheName = CACHE_NAME)
     public EventResource getEventById(@PathParam(ID) Long id) {
         return new EventResourceProvider(session, id);
     }
 
     @GET
     @Path("/title/{title}")
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<Set<EventJson>> searchEventsByTitle(@PathParam("title") String title) {
         return getSetOfEvents(session.eventBus(), EVENT_SEARCH_TITLE_EVENT, title);
     }
 
     @GET
     @Path("/coordinates")
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<Set<EventJson>> searchEventsByCoordinates(@QueryParam("longitude") Double longitude,
                                                          @QueryParam("latitude") Double latitude) {
         if (longitude == null || latitude == null) {
@@ -85,6 +92,7 @@ public class EventsResourceProvider implements EventsResource {
 
     @GET
     @Path("/count")
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<Long> getEventsCount() {
         return session.eventBus().<Long>request(EVENT_COUNT_EVENT, null).onItem().transform(Message::body);
     }
