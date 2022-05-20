@@ -4,7 +4,6 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import org.mabartos.meetmethere.api.domain.User;
 import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
-import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
 import org.mabartos.meetmethere.interaction.rest.api.UsersResource;
@@ -26,6 +25,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
+import static org.mabartos.meetmethere.api.model.eventbus.user.UserEventsNames.USER_CREATE_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.user.UserEventsNames.USER_GET_EMAIL_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.user.UserEventsNames.USER_GET_USERNAME_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.user.UserEventsNames.USER_GET_USERS_EVENT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;
@@ -49,13 +52,13 @@ public class UsersResourceProvider implements UsersResource {
     @GET
     @Path("/username/{username}")
     public Uni<UserJson> getUserByUsername(@PathParam("username") String username) {
-        return getSingleUser(session.eventBus(), UserService.USER_GET_USERNAME_EVENT, username);
+        return getSingleUser(session.eventBus(), USER_GET_USERNAME_EVENT, username);
     }
 
     @GET
     @Path("/email/{email}")
     public Uni<UserJson> getUserByEmail(@PathParam("email") String email) {
-        return getSingleUser(session.eventBus(), UserService.USER_GET_EMAIL_EVENT, email);
+        return getSingleUser(session.eventBus(), USER_GET_EMAIL_EVENT, email);
     }
 
     @GET
@@ -64,7 +67,7 @@ public class UsersResourceProvider implements UsersResource {
         firstResult = firstResult != null ? firstResult : 0;
         maxResults = maxResults != null ? maxResults : Integer.MAX_VALUE;
 
-        return getSetOfUsers(session.eventBus(), UserService.USER_GET_USERS_EVENT, new PaginationObject(firstResult, maxResults));
+        return getSetOfUsers(session.eventBus(), USER_GET_USERS_EVENT, new PaginationObject(firstResult, maxResults));
     }
 
     @GET
@@ -75,7 +78,7 @@ public class UsersResourceProvider implements UsersResource {
 
     @POST
     public Uni<Long> createUser(UserJson user) {
-        return EventBusUtil.createEntity(session.eventBus(), UserService.USER_CREATE_EVENT, mapper.toDomain(user));
+        return EventBusUtil.createEntity(session.eventBus(), USER_CREATE_EVENT, mapper.toDomain(user));
     }
 
     protected static Uni<UserJson> getSingleUser(EventBus bus, String address, Object object) {

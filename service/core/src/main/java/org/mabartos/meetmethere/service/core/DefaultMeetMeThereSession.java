@@ -11,9 +11,12 @@ import org.mabartos.meetmethere.api.service.EventInvitationService;
 import org.mabartos.meetmethere.api.service.EventService;
 import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
-import org.mabartos.meetmethere.service.core.store.DefaultEventStoreFactory;
-import org.mabartos.meetmethere.service.core.store.DefaultInvitationStoreFactory;
-import org.mabartos.meetmethere.service.core.store.DefaultUserStoreFactory;
+import org.mabartos.meetmethere.service.core.factory.EventServiceFactory;
+import org.mabartos.meetmethere.service.core.factory.InvitationServiceFactory;
+import org.mabartos.meetmethere.service.core.factory.UserServiceFactory;
+import org.mabartos.meetmethere.service.core.store.EventStoreFactory;
+import org.mabartos.meetmethere.service.core.store.InvitationStoreFactory;
+import org.mabartos.meetmethere.service.core.store.UserStoreFactory;
 
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
@@ -32,32 +35,32 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
 
     @Override
     public UserService users() {
-        return new DefaultUserService(this);
+        return new UserServiceFactory().create(this);
     }
 
     @Override
     public UserProvider userStorage() {
-        return new DefaultUserStoreFactory().create(this);
+        return new UserStoreFactory().create(this);
     }
 
     @Override
     public EventService events() {
-        return new DefaultEventService(this);
+        return new EventServiceFactory().create(this);
     }
 
     @Override
     public EventProvider eventStorage() {
-        return new DefaultEventStoreFactory().create(this);
+        return new EventStoreFactory().create(this);
     }
 
     @Override
     public EventInvitationService invitations() {
-        return new DefaultEventInvitationService(this);
+        return new InvitationServiceFactory().create(this);
     }
 
     @Override
     public InvitationProvider invitationStorage() {
-        return new DefaultInvitationStoreFactory().create(this);
+        return new InvitationStoreFactory().create(this);
     }
 
     @Override

@@ -6,7 +6,7 @@ import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.model.caffeine.provider.CaffeineUserProvider;
 import org.mabartos.meetmethere.model.jpa.provider.JpaUserProviderFactory;
 
-public class DefaultUserStoreFactory implements ProviderFactory<UserProvider> {
+public class UserStoreFactory implements ProviderFactory<UserProvider> {
 
     @Override
     public UserProvider create(MeetMeThereSession session) {

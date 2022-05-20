@@ -1,4 +1,4 @@
-package org.mabartos.meetmethere.api.model.eventbus;
+package org.mabartos.meetmethere.api.model.eventbus.user;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

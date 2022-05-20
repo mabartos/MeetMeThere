@@ -20,6 +20,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_GET_EVENT_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_REMOVE_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_UPDATE_EVENT;
 import static org.mabartos.meetmethere.service.rest.EventsResourceProvider.getSingleEvent;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -37,12 +40,12 @@ public class EventResourceProvider implements EventResource {
 
     @GET
     public Uni<EventJson> getEvent() {
-        return getSingleEvent(session.eventBus(), EventService.EVENT_GET_EVENT_EVENT, eventId);
+        return getSingleEvent(session.eventBus(), EVENT_GET_EVENT_EVENT, eventId);
     }
 
     @DELETE
     public Response removeEvent() {
-        session.eventBus().publish(EventService.EVENT_REMOVE_EVENT, eventId);
+        session.eventBus().publish(EVENT_REMOVE_EVENT, eventId);
         return Response.ok().build();
     }
 
@@ -53,7 +56,7 @@ public class EventResourceProvider implements EventResource {
         }
         event.setId(eventId);
 
-        return getSingleEvent(session.eventBus(), EventService.EVENT_UPDATE_EVENT, mapper.toDomain(event));
+        return getSingleEvent(session.eventBus(), EVENT_UPDATE_EVENT, mapper.toDomain(event));
     }
 
     @Path("/invitations")

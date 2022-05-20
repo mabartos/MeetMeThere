@@ -25,6 +25,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.Set;
 
+import static org.mabartos.meetmethere.api.model.eventbus.invitation.InvitationEventsNames.EVENT_INVITE_COUNT_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.invitation.InvitationEventsNames.EVENT_INVITE_CREATE_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.invitation.InvitationEventsNames.EVENT_INVITE_GET_MULTIPLE_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.invitation.InvitationEventsNames.EVENT_INVITE_REMOVE_MULTIPLE_EVENT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -42,17 +46,17 @@ public class EventInvitationsResourceProvider implements EventInvitationsResourc
 
     @GET
     public Uni<Set<EventInvitationJson>> getInvitations() {
-        return getSetOfEventInvitations(session.eventBus(), EventInvitationService.EVENT_INVITE_GET_MULTIPLE_EVENT, eventId);
+        return getSetOfEventInvitations(session.eventBus(), EVENT_INVITE_GET_MULTIPLE_EVENT, eventId);
     }
 
     @POST
     public Uni<Long> createInvitation(EventInvitationJson invitation) {
-        return EventBusUtil.createEntity(session.eventBus(), EventInvitationService.EVENT_INVITE_CREATE_EVENT, mapper.toDomain(invitation));
+        return EventBusUtil.createEntity(session.eventBus(), EVENT_INVITE_CREATE_EVENT, mapper.toDomain(invitation));
     }
 
     @DELETE
     public Response removeInvitations() {
-        session.eventBus().publish(EventInvitationService.EVENT_INVITE_REMOVE_MULTIPLE_EVENT, eventId);
+        session.eventBus().publish(EVENT_INVITE_REMOVE_MULTIPLE_EVENT, eventId);
         return Response.ok().build();
     }
 
@@ -65,7 +69,7 @@ public class EventInvitationsResourceProvider implements EventInvitationsResourc
     @Path("/count")
     public Uni<Long> getInvitationsCount() {
         return session.eventBus()
-                .<Long>request(EventInvitationService.EVENT_INVITE_COUNT_EVENT, eventId)
+                .<Long>request(EVENT_INVITE_COUNT_EVENT, eventId)
                 .onItem()
                 .transform(Message::body);
     }

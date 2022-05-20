@@ -6,7 +6,7 @@ import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.model.caffeine.provider.CaffeineEventInvitationProvider;
 import org.mabartos.meetmethere.model.jpa.provider.JpaEventInvitationProviderFactory;
 
-public class DefaultInvitationStoreFactory implements ProviderFactory<InvitationProvider> {
+public class InvitationStoreFactory implements ProviderFactory<InvitationProvider> {
 
     @Override
     public InvitationProvider create(MeetMeThereSession session) {

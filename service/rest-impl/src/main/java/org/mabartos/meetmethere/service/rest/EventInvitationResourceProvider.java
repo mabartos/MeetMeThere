@@ -1,7 +1,6 @@
 package org.mabartos.meetmethere.service.rest;
 
 import io.smallrye.mutiny.Uni;
-import org.mabartos.meetmethere.api.service.EventInvitationService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationResource;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventInvitationJson;
@@ -17,6 +16,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import static org.mabartos.meetmethere.api.model.eventbus.invitation.InvitationEventsNames.EVENT_INVITE_GET_SINGLE_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.invitation.InvitationEventsNames.EVENT_INVITE_REMOVE_SINGLE_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.invitation.InvitationEventsNames.EVENT_INVITE_UPDATE_EVENT;
 import static org.mabartos.meetmethere.service.rest.EventInvitationsResourceProvider.getSingleEventInvitation;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -34,17 +36,17 @@ public class EventInvitationResourceProvider implements EventInvitationResource 
 
     @GET
     public Uni<EventInvitationJson> getInvitation() {
-        return getSingleEventInvitation(session.eventBus(), EventInvitationService.EVENT_INVITE_GET_SINGLE_EVENT, invitationId);
+        return getSingleEventInvitation(session.eventBus(), EVENT_INVITE_GET_SINGLE_EVENT, invitationId);
     }
 
     @DELETE
     public Response removeInvitation() {
-        session.eventBus().publish(EventInvitationService.EVENT_INVITE_REMOVE_SINGLE_EVENT, invitationId);
+        session.eventBus().publish(EVENT_INVITE_REMOVE_SINGLE_EVENT, invitationId);
         return Response.ok().build();
     }
 
     @PATCH
     public Uni<EventInvitationJson> updateInvitation(EventInvitationJson invitation) {
-        return getSingleEventInvitation(session.eventBus(), EventInvitationService.EVENT_INVITE_UPDATE_EVENT, mapper.toDomain(invitation));
+        return getSingleEventInvitation(session.eventBus(), EVENT_INVITE_UPDATE_EVENT, mapper.toDomain(invitation));
     }
 }

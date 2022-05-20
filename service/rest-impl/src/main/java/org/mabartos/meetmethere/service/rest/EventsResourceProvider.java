@@ -6,7 +6,6 @@ import io.vertx.mutiny.core.eventbus.Message;
 import org.mabartos.meetmethere.api.domain.Event;
 import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
-import org.mabartos.meetmethere.api.service.EventService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.EventResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventsResource;
@@ -29,6 +28,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import java.util.Set;
 
+import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_COUNT_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_CREATE_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_GET_EVENTS_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_SEARCH_COORDINATES_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_SEARCH_TITLE_EVENT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.FIRST_RESULT;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID;
 import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MAX_RESULTS;
@@ -49,7 +53,7 @@ public class EventsResourceProvider implements EventsResource {
         firstResult = firstResult != null ? firstResult : 0;
         maxResults = maxResults != null ? maxResults : Integer.MAX_VALUE;
 
-        return getSetOfEvents(session.eventBus(), EventService.EVENT_GET_EVENTS_EVENT, new PaginationObject(firstResult, maxResults));
+        return getSetOfEvents(session.eventBus(), EVENT_GET_EVENTS_EVENT, new PaginationObject(firstResult, maxResults));
     }
 
     @Path("/{id}")
@@ -60,7 +64,7 @@ public class EventsResourceProvider implements EventsResource {
     @GET
     @Path("/title/{title}")
     public Uni<Set<EventJson>> searchEventsByTitle(@PathParam("title") String title) {
-        return getSetOfEvents(session.eventBus(), EventService.EVENT_SEARCH_TITLE_EVENT, title);
+        return getSetOfEvents(session.eventBus(), EVENT_SEARCH_TITLE_EVENT, title);
     }
 
     @GET
@@ -71,18 +75,18 @@ public class EventsResourceProvider implements EventsResource {
             throw new BadRequestException("You need to specify both longitude and latitude.");
         }
 
-        return getSetOfEvents(session.eventBus(), EventService.EVENT_SEARCH_COORDINATES_EVENT, new Coordinates(longitude, latitude));
+        return getSetOfEvents(session.eventBus(), EVENT_SEARCH_COORDINATES_EVENT, new Coordinates(longitude, latitude));
     }
 
     @POST
     public Uni<Long> createEvent(EventJson event) {
-        return EventBusUtil.createEntity(session.eventBus(), EventService.EVENT_CREATE_EVENT, mapper.toDomain(event));
+        return EventBusUtil.createEntity(session.eventBus(), EVENT_CREATE_EVENT, mapper.toDomain(event));
     }
 
     @GET
     @Path("/count")
     public Uni<Long> getEventsCount() {
-        return session.eventBus().<Long>request(EventService.EVENT_COUNT_EVENT, null).onItem().transform(Message::body);
+        return session.eventBus().<Long>request(EVENT_COUNT_EVENT, null).onItem().transform(Message::body);
     }
 
     protected static Uni<EventJson> getSingleEvent(EventBus bus, String address, Object object) {

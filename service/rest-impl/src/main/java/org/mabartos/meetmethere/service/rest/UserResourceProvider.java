@@ -18,6 +18,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import static org.mabartos.meetmethere.api.model.eventbus.user.UserEventsNames.USER_GET_USER_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.user.UserEventsNames.USER_REMOVE_EVENT;
+import static org.mabartos.meetmethere.api.model.eventbus.user.UserEventsNames.USER_UPDATE_EVENT;
 import static org.mabartos.meetmethere.service.rest.UsersResourceProvider.getSingleUser;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -35,12 +38,12 @@ public class UserResourceProvider implements UserResource {
 
     @GET
     public Uni<UserJson> getUser() {
-        return getSingleUser(session.eventBus(), UserService.USER_GET_USER_EVENT, userId);
+        return getSingleUser(session.eventBus(), USER_GET_USER_EVENT, userId);
     }
 
     @DELETE
     public Response removeUser() {
-        session.eventBus().publish(UserService.USER_REMOVE_EVENT, userId);
+        session.eventBus().publish(USER_REMOVE_EVENT, userId);
         return Response.ok().build();
     }
 
@@ -51,6 +54,6 @@ public class UserResourceProvider implements UserResource {
         }
         user.setId(userId);
 
-        return getSingleUser(session.eventBus(), UserService.USER_UPDATE_EVENT, mapper.toDomain(user));
+        return getSingleUser(session.eventBus(), USER_UPDATE_EVENT, mapper.toDomain(user));
     }
 }

@@ -1,6 +1,5 @@
 package org.mabartos.meetmethere.service.core;
 
-import io.quarkus.vertx.ConsumeEvent;
 import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.api.domain.Event;
 import org.mabartos.meetmethere.api.mapper.ModelToDomain;
@@ -8,8 +7,6 @@ import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.ModelUpdater;
 import org.mabartos.meetmethere.api.model.UserModel;
-import org.mabartos.meetmethere.api.model.eventbus.EventSet;
-import org.mabartos.meetmethere.api.model.eventbus.PaginationObject;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
 import org.mabartos.meetmethere.api.service.EventService;
@@ -34,7 +31,6 @@ public class DefaultEventService implements EventService {
     }
 
     @Override
-    @ConsumeEvent(value = EVENT_CREATE_EVENT, blocking = true)
     public Uni<Long> createEvent(Event event) throws ModelDuplicateException {
         if (event.getId() != null && session.eventStorage().getEventById(event.getId()) != null) {
             throw new ModelDuplicateException("Event already exists with the id.");
@@ -51,7 +47,6 @@ public class DefaultEventService implements EventService {
     }
 
     @Override
-    @ConsumeEvent(value = EVENT_UPDATE_EVENT, blocking = true)
     public Uni<Event> updateEvent(Event event) throws ModelNotFoundException {
         EventModel model = Optional.ofNullable(session.eventStorage().getEventById(event.getId()))
                 .orElseThrow(ModelNotFoundException::new);
@@ -67,41 +62,37 @@ public class DefaultEventService implements EventService {
     }
 
     @Override
-    @ConsumeEvent(value = EVENT_GET_EVENTS_EVENT, blocking = true)
-    public Uni<EventSet> getEvents(PaginationObject paginationObject) {
-        Set<Event> eventSet = session.eventStorage()
-                .getEvents(paginationObject.getFirstResult(), paginationObject.getMaxResult())
+    public Uni<Set<Event>> getEvents(Integer firstResult, Integer maxResults) {
+        final Set<Event> eventSet = session.eventStorage()
+                .getEvents(firstResult, maxResults)
                 .stream()
                 .map(ModelToDomain::toDomain)
                 .collect(Collectors.toSet());
 
-        return Uni.createFrom().item(new EventSet(eventSet));
+        return Uni.createFrom().item(eventSet);
     }
 
     @Override
-    @ConsumeEvent(value = EVENT_SEARCH_TITLE_EVENT, blocking = true)
-    public Uni<EventSet> searchEventsByTitle(String title) {
+    public Uni<Set<Event>> searchEventsByTitle(String title) {
         final Set<Event> events = session.eventStorage()
                 .searchByTitle(title)
                 .stream()
                 .map(ModelToDomain::toDomain)
                 .collect(Collectors.toSet());
-        return Uni.createFrom().item(new EventSet(events));
+        return Uni.createFrom().item(events);
     }
 
     @Override
-    @ConsumeEvent(value = EVENT_SEARCH_COORDINATES_EVENT, blocking = true)
-    public Uni<EventSet> searchEventsByCoordinates(Coordinates coordinates) {
+    public Uni<Set<Event>> searchEventsByCoordinates(Coordinates coordinates) {
         final Set<Event> events = session.eventStorage()
                 .searchByCoordinates(coordinates)
                 .stream()
                 .map(ModelToDomain::toDomain)
                 .collect(Collectors.toSet());
-        return Uni.createFrom().item(new EventSet(events));
+        return Uni.createFrom().item(events);
     }
 
     @Override
-    @ConsumeEvent(value = EVENT_GET_EVENT_EVENT, blocking = true)
     public Uni<Event> getEvent(Long id) {
         EventModel model = session.eventStorage().getEventById(id);
         if (model == null) throw new ModelNotFoundException();
@@ -113,13 +104,11 @@ public class DefaultEventService implements EventService {
     }
 
     @Override
-    @ConsumeEvent(value = EVENT_COUNT_EVENT, blocking = true)
-    public Uni<Long> getEventsCount(Object ignore) {
+    public Uni<Long> getEventsCount() {
         return Uni.createFrom().item(session.eventStorage().getEventsCount());
     }
 
     @Override
-    @ConsumeEvent(value = EVENT_REMOVE_EVENT, blocking = true)
     public void removeEvent(Long eventId) throws ModelNotFoundException {
         session.eventStorage().removeEvent(eventId);
     }

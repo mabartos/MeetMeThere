@@ -1,4 +1,4 @@
-package org.mabartos.meetmethere.api.model.eventbus;
+package org.mabartos.meetmethere.api.model.eventbus.user;
 
 import org.mabartos.meetmethere.api.codecs.SetHolder;
 import org.mabartos.meetmethere.api.domain.User;
