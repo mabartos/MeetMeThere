@@ -4,6 +4,7 @@ import io.quarkus.cache.Cache;
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheName;
 import io.quarkus.cache.CacheResult;
+import org.mabartos.meetmethere.api.model.AddressModel;
 import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.UserModel;
@@ -43,6 +44,14 @@ public class CaffeineEventProvider implements EventProvider {
 
     @CacheInvalidate(cacheName = CACHE_NAME)
     public void invalidateById(Long id) {
+    }
+
+    @CacheInvalidate(cacheName = CACHE_NAME)
+    public void invalidateByTitle(String title) {
+    }
+
+    @CacheInvalidate(cacheName = CACHE_NAME)
+    public void invalidateByCoordinates(Coordinates coordinates) {
     }
 
     @Override
@@ -86,6 +95,12 @@ public class CaffeineEventProvider implements EventProvider {
     @Override
     public EventModel updateEvent(EventModel event) {
         invalidateById(event.getId());
+        invalidateByTitle(event.getEventTitle());
+        final AddressModel venue = event.getVenue();
+        if (venue != null && venue.getCoordinates() != null) {
+            invalidateByCoordinates(venue.getCoordinates());
+        }
+
         return secondLevelStore.updateEvent(event);
     }
 }

@@ -11,8 +11,8 @@ import org.mabartos.meetmethere.api.service.EventInvitationService;
 import org.mabartos.meetmethere.api.service.EventService;
 import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
-import org.mabartos.meetmethere.model.jpa.provider.JpaEventInvitationProviderFactory;
 import org.mabartos.meetmethere.service.core.store.DefaultEventStoreFactory;
+import org.mabartos.meetmethere.service.core.store.DefaultInvitationStoreFactory;
 import org.mabartos.meetmethere.service.core.store.DefaultUserStoreFactory;
 
 import javax.enterprise.context.RequestScoped;
@@ -20,7 +20,6 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
-// TODO don't hardcode it
 @RequestScoped
 @Transactional
 public class DefaultMeetMeThereSession implements MeetMeThereSession {
@@ -58,7 +57,7 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
 
     @Override
     public InvitationProvider invitationStorage() {
-        return new JpaEventInvitationProviderFactory().create(this);
+        return new DefaultInvitationStoreFactory().create(this);
     }
 
     @Override

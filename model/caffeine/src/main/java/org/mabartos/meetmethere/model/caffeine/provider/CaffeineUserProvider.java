@@ -36,6 +36,14 @@ public class CaffeineUserProvider implements UserProvider {
     public void invalidateById(Long id) {
     }
 
+    @CacheInvalidate(cacheName = CACHE_NAME)
+    public void invalidateByUsername(String username) {
+    }
+
+    @CacheInvalidate(cacheName = CACHE_NAME)
+    public void invalidateByEmail(String email) {
+    }
+
     @Override
     public UserModel getUserById(Long id) {
         return searchCache(id, v -> secondLevelStore.getUserById(id));
@@ -82,6 +90,9 @@ public class CaffeineUserProvider implements UserProvider {
     @Override
     public UserModel updateUser(UserModel user) {
         invalidateById(user.getId());
+        invalidateByUsername(user.getUsername());
+        invalidateByEmail(user.getEmail());
+
         return secondLevelStore.updateUser(user);
     }
 }
