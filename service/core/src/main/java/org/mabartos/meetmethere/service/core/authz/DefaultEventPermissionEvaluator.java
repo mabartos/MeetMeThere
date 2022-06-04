@@ -1,16 +1,17 @@
 package org.mabartos.meetmethere.service.core.authz;
 
-import org.mabartos.meetmethere.api.authz.PermissionEvaluator;
+import org.mabartos.meetmethere.api.authz.EventPermissionEvaluator;
+import org.mabartos.meetmethere.api.authz.InvitationPermissionEvaluator;
 import org.mabartos.meetmethere.api.domain.Event;
 import org.mabartos.meetmethere.api.mapper.ModelToDomain;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
-public class EventPermissionEvaluator implements PermissionEvaluator<Event, Long> {
+public class DefaultEventPermissionEvaluator implements EventPermissionEvaluator {
     private final MeetMeThereSession session;
 
-    public EventPermissionEvaluator(MeetMeThereSession session) {
+    public DefaultEventPermissionEvaluator(MeetMeThereSession session) {
         this.session = session;
     }
 
@@ -56,5 +57,10 @@ public class EventPermissionEvaluator implements PermissionEvaluator<Event, Long
         if (authUser == null) return false;
 
         return session.auth().isAdmin() || isCreatorOrOrganizator(authUser.getId(), event);
+    }
+
+    @Override
+    public InvitationPermissionEvaluator invitations() {
+        return new DefaultInvitationPermissionEvaluator(session);
     }
 }

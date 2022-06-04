@@ -1,4 +1,4 @@
-package org.mabartos.meetmethere.service.core;
+package org.mabartos.meetmethere.service.core.session;
 
 /*import javax.persistence.EntityManager;
 import org.mabartos.meetmethere.api.model.jpa.provider.JpaEventProvider;*/
@@ -11,6 +11,7 @@ import org.mabartos.meetmethere.api.service.AuthService;
 import org.mabartos.meetmethere.api.service.EventInvitationService;
 import org.mabartos.meetmethere.api.service.EventService;
 import org.mabartos.meetmethere.api.service.UserService;
+import org.mabartos.meetmethere.api.session.AppContext;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.service.core.factory.AuthServiceFactory;
 import org.mabartos.meetmethere.service.core.factory.EventServiceFactory;
@@ -34,6 +35,11 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
 
     @Inject
     EventBus eventBus;
+
+    @Override
+    public AppContext context() {
+        return new DefaultAppContext(this);
+    }
 
     @Override
     public AuthService auth() {

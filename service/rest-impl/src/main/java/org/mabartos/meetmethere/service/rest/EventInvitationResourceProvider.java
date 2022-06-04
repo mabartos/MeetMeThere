@@ -11,6 +11,7 @@ import org.mabartos.meetmethere.interaction.rest.api.model.mapper.EventInvitatio
 import org.mapstruct.factory.Mappers;
 
 import javax.transaction.Transactional;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -36,16 +37,21 @@ public class EventInvitationResourceProvider implements EventInvitationResource 
     public EventInvitationResourceProvider(MeetMeThereSession session, Long invitationId) {
         this.session = session;
         this.invitationId = invitationId;
+        session.context().setCurrentInvitation(invitationId);
     }
 
     @GET
     @CacheResult(cacheName = EventInvitationsResourceProvider.CACHE_NAME)
     public Uni<EventInvitationJson> getInvitation() {
+        session.auth().events().invitations().requireViewId(invitationId);
+
         return getSingleEventInvitation(session.eventBus(), EVENT_INVITE_GET_SINGLE_EVENT, invitationId);
     }
 
     @DELETE
     public Response removeInvitation() {
+        session.auth().events().invitations().requireManageId(invitationId);
+
         session.eventBus().publish(EVENT_INVITE_REMOVE_SINGLE_EVENT, invitationId);
         invalidateById(invitationId);
         return Response.ok().build();
@@ -53,6 +59,12 @@ public class EventInvitationResourceProvider implements EventInvitationResource 
 
     @PATCH
     public Uni<EventInvitationJson> updateInvitation(EventInvitationJson invitation) {
+        if (!invitationId.equals(invitation.getEventId())) {
+            throw new BadRequestException("Cannot update invitation. Different Invitation IDs.");
+        }
+
+        session.auth().events().invitations().requireManageId(invitationId);
+
         invalidateById(invitationId);
         return getSingleEventInvitation(session.eventBus(), EVENT_INVITE_UPDATE_EVENT, mapper.toDomain(invitation));
     }

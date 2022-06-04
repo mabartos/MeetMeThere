@@ -7,7 +7,6 @@ import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
 import org.mabartos.meetmethere.api.domain.EventInvitation;
-import org.mabartos.meetmethere.api.service.EventInvitationService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationResource;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationsResource;
@@ -53,17 +52,23 @@ public class EventInvitationsResourceProvider implements EventInvitationsResourc
     @GET
     @CacheResult(cacheName = CACHE_NAME)
     public Uni<Set<EventInvitationJson>> getInvitations() {
+        session.auth().events().invitations().canView();
+
         return getSetOfEventInvitations(session.eventBus(), EVENT_INVITE_GET_MULTIPLE_EVENT, eventId);
     }
 
     @POST
     public Uni<Long> createInvitation(EventInvitationJson invitation) {
+        session.auth().events().invitations().requireManage(invitation);
+
         return EventBusUtil.createEntity(session.eventBus(), EVENT_INVITE_CREATE_EVENT, mapper.toDomain(invitation));
     }
 
     @DELETE
     @CacheInvalidateAll(cacheName = CACHE_NAME)
     public Response removeInvitations() {
+        session.auth().events().requireManageId(eventId);
+
         session.eventBus().publish(EVENT_INVITE_REMOVE_MULTIPLE_EVENT, eventId);
         return Response.ok().build();
     }
@@ -78,6 +83,8 @@ public class EventInvitationsResourceProvider implements EventInvitationsResourc
     @Path("/count")
     @CacheResult(cacheName = CACHE_NAME)
     public Uni<Long> getInvitationsCount() {
+        session.auth().events().requireViewId(eventId);
+
         return session.eventBus()
                 .<Long>request(EVENT_INVITE_COUNT_EVENT, eventId)
                 .onItem()

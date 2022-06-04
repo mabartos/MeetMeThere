@@ -13,6 +13,8 @@ import javax.persistence.EntityManager;
 
 public interface MeetMeThereSession {
 
+    AppContext context();
+
     AuthService auth();
 
     UserService users();

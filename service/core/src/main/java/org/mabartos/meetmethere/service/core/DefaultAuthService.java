@@ -3,12 +3,11 @@ package org.mabartos.meetmethere.service.core;
 import org.eclipse.microprofile.jwt.Claim;
 import org.eclipse.microprofile.jwt.Claims;
 import org.eclipse.microprofile.jwt.JsonWebToken;
-import org.mabartos.meetmethere.api.authz.PermissionEvaluator;
-import org.mabartos.meetmethere.api.domain.Event;
+import org.mabartos.meetmethere.api.authz.EventPermissionEvaluator;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.service.AuthService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
-import org.mabartos.meetmethere.service.core.authz.EventPermissionEvaluator;
+import org.mabartos.meetmethere.service.core.authz.DefaultEventPermissionEvaluator;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
@@ -57,7 +56,7 @@ public class DefaultAuthService implements AuthService {
     }
 
     @Override
-    public PermissionEvaluator<Event,Long> events() {
-        return new EventPermissionEvaluator(session);
+    public EventPermissionEvaluator events() {
+        return new DefaultEventPermissionEvaluator(session);
     }
 }

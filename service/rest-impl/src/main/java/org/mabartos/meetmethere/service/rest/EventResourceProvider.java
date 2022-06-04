@@ -38,6 +38,7 @@ public class EventResourceProvider implements EventResource {
     public EventResourceProvider(MeetMeThereSession session, Long id) {
         this.session = session;
         this.eventId = id;
+        session.context().setCurrentEvent(id);
     }
 
     @GET

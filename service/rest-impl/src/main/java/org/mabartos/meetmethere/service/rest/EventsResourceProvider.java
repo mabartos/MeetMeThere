@@ -54,6 +54,8 @@ public class EventsResourceProvider implements EventsResource {
     @GET
     @CacheResult(cacheName = CACHE_NAME)
     public Uni<Set<EventJson>> getEvents(@QueryParam(FIRST_RESULT) Integer firstResult, @QueryParam(MAX_RESULTS) Integer maxResults) {
+        session.auth().events().requireView();
+
         firstResult = firstResult != null ? firstResult : 0;
         maxResults = maxResults != null ? maxResults : Integer.MAX_VALUE;
 
@@ -63,6 +65,8 @@ public class EventsResourceProvider implements EventsResource {
     @Path("/{id}")
     @CacheResult(cacheName = CACHE_NAME)
     public EventResource getEventById(@PathParam(ID) Long id) {
+        session.auth().events().requireViewId(id);
+
         return new EventResourceProvider(session, id);
     }
 
