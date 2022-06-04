@@ -23,4 +23,8 @@ public interface UserModel extends HasAttributes<String, String>, HasId<String> 
     Set<EventModel> getOrganizedEvents();
 
     void setOrganizedEvents(Set<EventModel> events);
+
+    Set<String> getRoles();
+
+    void setRoles(Set<String> roles);
 }

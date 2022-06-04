@@ -93,6 +93,6 @@ public class KeycloakUserProvider implements UserProvider {
     }
 
     private UserModel kcAdapter(UserRepresentation userRepresentation) {
-        return new KeycloakUserAdapter(session, keycloak, REALM, userRepresentation);
+        return new KeycloakUserAdapter(session, keycloak, REALM, CLIENT, userRepresentation);
     }
 }

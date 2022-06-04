@@ -27,6 +27,8 @@ public class User {
 
     private Set<Long> organizedEventsId;
 
+    private Set<String> roles;
+
     private Map<String, String> attributes;
 
     public User(String username, String email) {

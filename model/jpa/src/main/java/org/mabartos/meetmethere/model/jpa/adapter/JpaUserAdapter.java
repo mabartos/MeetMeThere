@@ -6,11 +6,11 @@ import org.mabartos.meetmethere.api.model.HasId;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.model.jpa.JpaModel;
-import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.model.jpa.util.JpaUtil;
 
 import javax.persistence.EntityManager;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -101,6 +101,16 @@ public class JpaUserAdapter implements UserModel, JpaModel<UserEntity> {
                 .collect(Collectors.toSet());
 
         getEntity().setOrganizedEvents(entities);
+    }
+
+    @Override
+    public Set<String> getRoles() {
+        return Collections.emptySet();
+    }
+
+    @Override
+    public void setRoles(Set<String> roles) {
+
     }
 
     @Override

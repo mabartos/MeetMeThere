@@ -9,6 +9,7 @@ import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.validation.constraints.NotNull;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -18,14 +19,17 @@ public class KeycloakUserAdapter implements UserModel {
     private final MeetMeThereSession session;
     private final UserRepresentation userRepresentation;
     private final UserResource userResource;
+    private final String client;
 
     public KeycloakUserAdapter(@NotNull MeetMeThereSession session,
                                @NotNull Keycloak keycloak,
                                @NotNull String realm,
+                               @NotNull String client,
                                @NotNull UserRepresentation userRepresentation) {
         this.session = session;
         this.userRepresentation = userRepresentation;
         this.userResource = keycloak.realm(realm).users().get(userRepresentation.getId());
+        this.client = client;
     }
 
     @Override
@@ -112,5 +116,17 @@ public class KeycloakUserAdapter implements UserModel {
             organizers.add(this);
             f.setOrganizers(organizers);
         });
+    }
+
+    @Override
+    public Set<String> getRoles() {
+        final Set<String> roles = new HashSet<>(userRepresentation.getRealmRoles());
+        roles.addAll(new HashSet<>(userRepresentation.getClientRoles().get(client)));
+        return roles;
+    }
+
+    @Override
+    public void setRoles(Set<String> roles) {
+        throw new UnsupportedOperationException("Cannot set roles");
     }
 }

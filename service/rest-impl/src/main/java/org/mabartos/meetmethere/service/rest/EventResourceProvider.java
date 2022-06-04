@@ -43,12 +43,16 @@ public class EventResourceProvider implements EventResource {
     @GET
     @CacheResult(cacheName = EventsResourceProvider.CACHE_NAME)
     public Uni<EventJson> getEvent() {
+        session.auth().events().requireViewId(eventId);
+
         return getSingleEvent(session.eventBus(), EVENT_GET_EVENT_EVENT, eventId);
     }
 
     @DELETE
     @Authenticated
     public Response removeEvent() {
+        session.auth().events().requireManageId(eventId);
+
         invalidateById(eventId);
         session.eventBus().publish(EVENT_REMOVE_EVENT, eventId);
         return Response.ok().build();
@@ -60,6 +64,8 @@ public class EventResourceProvider implements EventResource {
         if (event.getId() != null && !eventId.equals(event.getId())) {
             throw new BadRequestException("Cannot update Event - different IDs");
         }
+        session.auth().events().requireManageId(eventId);
+
         event.setId(eventId);
 
         invalidateById(eventId);
