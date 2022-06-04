@@ -1,5 +1,6 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
@@ -24,10 +25,11 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
 @Tag(name = "Users Resource API", description = "Provide API for all users.")
+@Authenticated
 public interface UsersResource {
 
     @Path("/{id}")
-    UserResource getUserById(@PathParam(ID) Long id);
+    UserResource getUserById(@PathParam(ID) String id);
 
     @GET
     @Path("/username/{username}")
@@ -45,6 +47,7 @@ public interface UsersResource {
     @Path("/count")
     Uni<Long> getUsersCount();
 
+    @Deprecated
     @POST
     Uni<Long> createUser(UserJson user);
 }

@@ -1,18 +1,5 @@
 package org.mabartos.meetmethere.model.jpa.entity;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -20,6 +7,14 @@ import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -40,14 +35,9 @@ public class EventEntity extends BaseEntity {
 
     private boolean isPublic = false;
 
-    @ManyToMany
-    @JoinTable(
-            name = "Event_Organizers",
-            joinColumns = {@JoinColumn(name = "event_id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_id")}
-    )
+    @ElementCollection(fetch = FetchType.EAGER)
     @BatchSize(size = 20)
-    private Set<UserEntity> organizers = new HashSet<>();
+    private Set<String> organizersId = new HashSet<>();
 
     @CreationTimestamp
     private LocalDateTime createdAt;
@@ -59,11 +49,9 @@ public class EventEntity extends BaseEntity {
 
     private LocalDateTime endTime;
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = UserEntity.class)
-    private UserEntity updatedBy;
+    private String updatedById;
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = UserEntity.class)
-    private UserEntity creator;
+    private String creatorId;
 
     @Embedded
     private AddressEntity venue;

@@ -2,6 +2,7 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.quarkus.cache.CacheInvalidateAll;
 import io.quarkus.cache.CacheResult;
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
@@ -36,6 +37,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.ID
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
+@Authenticated
 public class EventInvitationsResourceProvider implements EventInvitationsResource {
     static final String CACHE_NAME = "event-invitation-resource-provider-cache";
 

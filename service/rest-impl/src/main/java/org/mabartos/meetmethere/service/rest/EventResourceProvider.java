@@ -2,6 +2,7 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationsResource;
@@ -46,6 +47,7 @@ public class EventResourceProvider implements EventResource {
     }
 
     @DELETE
+    @Authenticated
     public Response removeEvent() {
         invalidateById(eventId);
         session.eventBus().publish(EVENT_REMOVE_EVENT, eventId);
@@ -53,6 +55,7 @@ public class EventResourceProvider implements EventResource {
     }
 
     @PATCH
+    @Authenticated
     public Uni<EventJson> updateEvent(EventJson event) {
         if (event.getId() != null && !eventId.equals(event.getId())) {
             throw new BadRequestException("Cannot update Event - different IDs");

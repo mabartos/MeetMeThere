@@ -2,6 +2,7 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.EventInvitationResource;
@@ -26,6 +27,7 @@ import static org.mabartos.meetmethere.service.rest.EventInvitationsResourceProv
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
+@Authenticated
 public class EventInvitationResourceProvider implements EventInvitationResource {
     private static final EventInvitationJsonDomainMapper mapper = Mappers.getMapper(EventInvitationJsonDomainMapper.class);
     private final MeetMeThereSession session;

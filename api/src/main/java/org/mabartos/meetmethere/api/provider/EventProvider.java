@@ -17,6 +17,10 @@ public interface EventProvider {
 
     Set<EventModel> getEvents(int firstResult, int maxResults);
 
+    Set<EventModel> getEventsByUser(String userId);
+
+    Set<EventModel> getEventsByOrganizator(String userId);
+
     long getEventsCount();
 
     EventModel createEvent(EventModel event) throws ModelDuplicateException;

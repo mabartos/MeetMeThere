@@ -2,6 +2,7 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.interaction.rest.api.UserResource;
@@ -27,12 +28,13 @@ import static org.mabartos.meetmethere.service.rest.UsersResourceProvider.getSin
 @Consumes(MediaType.APPLICATION_JSON)
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
+@Authenticated
 public class UserResourceProvider implements UserResource {
     private static final UserJsonDomainMapper mapper = Mappers.getMapper(UserJsonDomainMapper.class);
     private final MeetMeThereSession session;
-    private final Long userId;
+    private final String userId;
 
-    public UserResourceProvider(MeetMeThereSession session, Long userId) {
+    public UserResourceProvider(MeetMeThereSession session, String userId) {
         this.session = session;
         this.userId = userId;
     }
@@ -65,7 +67,7 @@ public class UserResourceProvider implements UserResource {
     }
 
     @CacheInvalidate(cacheName = UsersResourceProvider.CACHE_NAME)
-    void invalidateById(Long id) {
+    void invalidateById(String id) {
     }
 
     @CacheInvalidate(cacheName = UsersResourceProvider.CACHE_NAME)

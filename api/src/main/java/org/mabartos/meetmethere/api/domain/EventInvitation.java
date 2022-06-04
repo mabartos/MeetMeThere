@@ -17,11 +17,11 @@ public class EventInvitation implements Serializable {
 
     private String senderName;
 
-    private Long senderId;
+    private String senderId;
 
     private String receiverName;
 
-    private Long receiverId;
+    private String receiverId;
 
     private String message;
 

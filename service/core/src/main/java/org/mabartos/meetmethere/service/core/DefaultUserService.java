@@ -28,7 +28,7 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public Uni<User> getUserById(Long id) throws ModelNotFoundException {
+    public Uni<User> getUserById(String id) throws ModelNotFoundException {
         final UserModel model = session.userStorage().getUserById(id);
         if (model == null) throw new ModelNotFoundException();
 
@@ -76,21 +76,20 @@ public class DefaultUserService implements UserService {
     }
 
     @Override
-    public Uni<Long> createUser(String email, String username) throws ModelDuplicateException {
+    public Uni<String> createUser(String email, String username) throws ModelDuplicateException {
         return Uni.createFrom().item(session.userStorage().createUser(email, username).getId());
     }
 
     @Override
-    public Uni<Long> createUser(User user) throws ModelDuplicateException {
+    public Uni<String> createUser(User user) throws ModelDuplicateException {
         UserModel model = session.userStorage().createUser(user.getEmail(), user.getUsername());
         ModelUpdater.updateModel(user, model);
 
-        final Long id = session.userStorage().updateUser(model).getId();
-        return Uni.createFrom().item(id);
+        return Uni.createFrom().item(session.userStorage().updateUser(model).getId());
     }
 
     @Override
-    public void removeUser(Long id) {
+    public void removeUser(String id) {
         session.userStorage().removeUser(id);
     }
 

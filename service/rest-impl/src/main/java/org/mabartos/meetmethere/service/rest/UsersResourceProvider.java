@@ -1,6 +1,7 @@
 package org.mabartos.meetmethere.service.rest;
 
 import io.quarkus.cache.CacheResult;
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import org.mabartos.meetmethere.api.domain.User;
@@ -39,6 +40,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Produces(MediaType.APPLICATION_JSON)
 @RequestScoped
 @Transactional
+@Authenticated
 public class UsersResourceProvider implements UsersResource {
     private static final UserJsonDomainMapper mapper = Mappers.getMapper(UserJsonDomainMapper.class);
     static final String CACHE_NAME = "users-resource-provider-cache";
@@ -48,7 +50,7 @@ public class UsersResourceProvider implements UsersResource {
 
     @Path("/{id}")
     @CacheResult(cacheName = CACHE_NAME)
-    public UserResource getUserById(@PathParam(ID) Long id) {
+    public UserResource getUserById(@PathParam(ID) String id) {
         return new UserResourceProvider(session, id);
     }
 
@@ -83,6 +85,7 @@ public class UsersResourceProvider implements UsersResource {
         return Uni.createFrom().item(session.userStorage().getUsersCount());
     }
 
+    @Deprecated
     @POST
     public Uni<Long> createUser(UserJson user) {
         return EventBusUtil.createEntity(session.eventBus(), USER_CREATE_EVENT, mapper.toDomain(user));

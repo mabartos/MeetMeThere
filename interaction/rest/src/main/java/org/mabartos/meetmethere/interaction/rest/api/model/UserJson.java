@@ -14,6 +14,7 @@ public class UserJson extends User {
     @JsonIgnore
     private Set<Long> organizedEventsId;
 
+    @Deprecated
     @JsonCreator
     public UserJson(@JsonProperty("username") String username,
                     @JsonProperty("email") String email) {

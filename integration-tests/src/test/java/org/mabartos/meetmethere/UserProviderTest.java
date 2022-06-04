@@ -75,7 +75,7 @@ public class UserProviderTest {
     @Test
     public void removeInvalidUser() {
         try {
-            session.userStorage().removeUser(-4L);
+            session.userStorage().removeUser("-4");
             Assertions.fail();
         } catch (ModelNotFoundException expected) {
         }

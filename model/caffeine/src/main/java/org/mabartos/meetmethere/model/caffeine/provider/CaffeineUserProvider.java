@@ -33,7 +33,7 @@ public class CaffeineUserProvider implements UserProvider {
     }
 
     @CacheInvalidate(cacheName = CACHE_NAME)
-    public void invalidateById(Long id) {
+    public void invalidateById(String id) {
     }
 
     @CacheInvalidate(cacheName = CACHE_NAME)
@@ -45,7 +45,7 @@ public class CaffeineUserProvider implements UserProvider {
     }
 
     @Override
-    public UserModel getUserById(Long id) {
+    public UserModel getUserById(String id) {
         return searchCache(id, v -> secondLevelStore.getUserById(id));
     }
 
@@ -82,8 +82,7 @@ public class CaffeineUserProvider implements UserProvider {
     }
 
     @Override
-    public void removeUser(Long id) {
-        invalidateById(id);
+    public void removeUser(String id) {
         secondLevelStore.removeUser(id);
     }
 

@@ -4,13 +4,12 @@ import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
+import org.mabartos.meetmethere.api.provider.EventProvider;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.model.jpa.adapter.JpaAddressAdapter;
 import org.mabartos.meetmethere.model.jpa.adapter.JpaEventAdapter;
 import org.mabartos.meetmethere.model.jpa.adapter.JpaInvitationAdapter;
-import org.mabartos.meetmethere.model.jpa.adapter.JpaUserAdapter;
 import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
-import org.mabartos.meetmethere.api.provider.EventProvider;
-import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.model.jpa.util.JpaUtil;
 
 import javax.persistence.EntityManager;
@@ -81,6 +80,33 @@ public class JpaEventProvider implements EventProvider {
     }
 
     @Override
+    public Set<EventModel> getEventsByUser(String userId) {
+        final Optional<List<EventEntity>> events = JpaUtil.catchNoResult(() ->
+                em.createQuery("select e from EventEntity e where e.creatorId=:userId", EventEntity.class)
+                        .setParameter("userId", userId)
+                        .getResultList()
+        );
+
+        if (events.isEmpty()) return Collections.emptySet();
+
+        return convertToModelSet(events.get());
+    }
+
+    @Override
+    public Set<EventModel> getEventsByOrganizator(String userId) {
+        //TODO need to check
+        final Optional<List<EventEntity>> events = JpaUtil.catchNoResult(() ->
+                em.createQuery("select e from EventEntity e where :userId in (e.organizersId)", EventEntity.class)
+                        .setParameter("userId", userId)
+                        .getResultList()
+        );
+
+        if (events.isEmpty()) return Collections.emptySet();
+
+        return convertToModelSet(events.get());
+    }
+
+    @Override
     public long getEventsCount() {
         return EventEntity.count();
     }
@@ -102,7 +128,7 @@ public class JpaEventProvider implements EventProvider {
     public EventModel createEvent(String title, UserModel creator) {
         EventEntity entity = new EventEntity();
         entity.setTitle(title);
-        entity.setCreator(JpaUserAdapter.convertToEntity(creator, em));
+        entity.setCreatorId(creator.getId());
 
         em.persist(entity);
         em.flush();
@@ -142,8 +168,8 @@ public class JpaEventProvider implements EventProvider {
         update(entity::setEndTime, model::getEndTime);
         update(entity::setAttributes, model::getAttributes);
 
-        update(entity::setCreator, () -> JpaUserAdapter.convertToEntity(model.getCreatedBy(), em));
-        update(entity::setUpdatedBy, () -> JpaUserAdapter.convertToEntity(model.getUpdatedBy(), em));
+        update(entity::setCreatorId, () -> model.getCreatedBy().getId());
+        update(entity::setUpdatedById, () -> model.getUpdatedBy().getId());
         update(entity::setVenue, () -> JpaAddressAdapter.convertToEntity(model.getVenue()));
         update(entity::setInvitations, () -> model.getInvitations()
                 .stream()

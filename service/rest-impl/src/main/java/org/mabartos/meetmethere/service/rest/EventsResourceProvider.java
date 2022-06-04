@@ -2,6 +2,7 @@ package org.mabartos.meetmethere.service.rest;
 
 import io.quarkus.cache.CacheInvalidate;
 import io.quarkus.cache.CacheResult;
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
@@ -86,6 +87,7 @@ public class EventsResourceProvider implements EventsResource {
     }
 
     @POST
+    @Authenticated
     public Uni<Long> createEvent(EventJson event) {
         return EventBusUtil.createEntity(session.eventBus(), EVENT_CREATE_EVENT, mapper.toDomain(event));
     }

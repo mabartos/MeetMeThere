@@ -8,8 +8,11 @@ import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
 
 import java.util.Set;
 
+/**
+ * We should keep the responsibility up to Identity providers to manage users
+ */
 public interface UserService {
-    Uni<User> getUserById(Long id) throws ModelNotFoundException;
+    Uni<User> getUserById(String id) throws ModelNotFoundException;
 
     Uni<User> getUserByUsername(String username) throws ModelNotFoundException;
 
@@ -19,12 +22,15 @@ public interface UserService {
 
     Uni<Long> getUsersCount();
 
-    Uni<Long> createUser(String email, String username) throws ModelDuplicateException;
+    @Deprecated
+    Uni<String> createUser(String email, String username) throws ModelDuplicateException;
 
-    Uni<Long> createUser(User user) throws ModelDuplicateException;
+    @Deprecated
+    Uni<String> createUser(User user) throws ModelDuplicateException;
 
-    void removeUser(Long id) throws ModelNotFoundException;
+    @Deprecated
+    void removeUser(String id) throws ModelNotFoundException;
 
+    @Deprecated
     Uni<UserModel> updateUser(User user) throws ModelNotFoundException;
-
 }

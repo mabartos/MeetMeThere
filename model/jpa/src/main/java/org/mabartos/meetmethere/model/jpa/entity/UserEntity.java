@@ -1,16 +1,15 @@
 package org.mabartos.meetmethere.model.jpa.entity;
 
-import javax.persistence.Column;
-import javax.persistence.ElementCollection;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.BatchSize;
 
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.Table;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -21,6 +20,7 @@ import java.util.Set;
 @NoArgsConstructor
 @Setter
 @Getter
+@Deprecated
 public class UserEntity extends BaseEntity {
 
     @Column(unique = true, nullable = false)
@@ -33,9 +33,9 @@ public class UserEntity extends BaseEntity {
 
     private String lastName;
 
-    @ManyToMany(mappedBy = "organizers")
+    @ElementCollection(fetch = FetchType.EAGER)
     @BatchSize(size = 20)
-    private Set<EventEntity> organizedEvents = new HashSet<>();
+    private Set<Long> organizedEvents = new HashSet<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     @BatchSize(size = 20)

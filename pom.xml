@@ -15,6 +15,7 @@
         <module>interaction</module>
         <module>service</module>
         <module>runner</module>
+        <module>integration</module>
     </modules>
 
     <properties>
@@ -70,6 +71,14 @@
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
             <version>1.4.2.Final</version>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-jwt</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>io.quarkus</groupId>
+            <artifactId>quarkus-smallrye-jwt-build</artifactId>
         </dependency>
     </dependencies>
 </project>

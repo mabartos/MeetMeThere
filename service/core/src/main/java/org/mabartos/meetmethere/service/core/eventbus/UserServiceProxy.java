@@ -39,7 +39,7 @@ public class UserServiceProxy {
     }
 
     @ConsumeEvent(value = USER_GET_USER_EVENT, blocking = true)
-    public Uni<User> getUserById(Long id) throws ModelNotFoundException {
+    public Uni<User> getUserById(String id) throws ModelNotFoundException {
         return delegate.getUserById(id);
     }
 
@@ -66,17 +66,17 @@ public class UserServiceProxy {
     }
 
     @ConsumeEvent(value = USER_CREATE_BASIC_EVENT, blocking = true)
-    public Uni<Long> createUser(EmailUsernameObject object) throws ModelDuplicateException {
+    public Uni<String> createUser(EmailUsernameObject object) throws ModelDuplicateException {
         return delegate.createUser(object.getEmail(), object.getUsername());
     }
 
     @ConsumeEvent(value = USER_CREATE_EVENT, blocking = true)
-    public Uni<Long> createUser(User user) throws ModelDuplicateException {
+    public Uni<String> createUser(User user) throws ModelDuplicateException {
         return delegate.createUser(user);
     }
 
     @ConsumeEvent(value = USER_REMOVE_EVENT, blocking = true)
-    public void removeUser(Long id) throws ModelNotFoundException {
+    public void removeUser(String id) throws ModelNotFoundException {
         delegate.removeUser(id);
     }
 

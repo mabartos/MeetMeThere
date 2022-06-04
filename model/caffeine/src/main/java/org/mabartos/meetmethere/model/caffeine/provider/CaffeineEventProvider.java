@@ -72,6 +72,18 @@ public class CaffeineEventProvider implements EventProvider {
 
     @Override
     @CacheResult(cacheName = CACHE_NAME)
+    public Set<EventModel> getEventsByUser(String userId) {
+        return secondLevelStore.getEventsByUser(userId);
+    }
+
+    @Override
+    @CacheResult(cacheName = CACHE_NAME)
+    public Set<EventModel> getEventsByOrganizator(String userId) {
+        return secondLevelStore.getEventsByOrganizator(userId);
+    }
+
+    @Override
+    @CacheResult(cacheName = CACHE_NAME)
     public long getEventsCount() {
         return secondLevelStore.getEventsCount();
     }

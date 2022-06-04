@@ -1,12 +1,13 @@
 package org.mabartos.meetmethere.model.jpa.provider;
 
+import org.mabartos.meetmethere.api.model.HasId;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
+import org.mabartos.meetmethere.api.provider.UserProvider;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.model.jpa.adapter.JpaEventAdapter;
 import org.mabartos.meetmethere.model.jpa.adapter.JpaUserAdapter;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
-import org.mabartos.meetmethere.api.provider.UserProvider;
-import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 import static org.mabartos.meetmethere.api.UpdateUtil.update;
 import static org.mabartos.meetmethere.model.jpa.util.JpaUtil.catchNoResult;
 
+@Deprecated
 @Transactional
 public class JpaUserProvider implements UserProvider {
     private final MeetMeThereSession session;
@@ -31,7 +33,7 @@ public class JpaUserProvider implements UserProvider {
     }
 
     @Override
-    public UserModel getUserById(Long id) {
+    public UserModel getUserById(String id) {
         final UserEntity entity = UserEntity.findById(id);
         if (entity == null) return null;
         return new JpaUserAdapter(session, em, entity);
@@ -112,8 +114,12 @@ public class JpaUserProvider implements UserProvider {
     }
 
     @Override
-    public void removeUser(Long id) {
-        UserEntity.deleteById(id);
+    public void removeUser(String id) {
+        try {
+            UserEntity.deleteById(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Cannot remove user. Invalid ID", e);
+        }
     }
 
     @Override
@@ -137,7 +143,7 @@ public class JpaUserProvider implements UserProvider {
         update(entity::setAttributes, model::getAttributes);
         update(entity::setOrganizedEvents, () -> model.getOrganizedEvents()
                 .stream()
-                .map(f -> JpaEventAdapter.convertToEntity(f, em))
+                .map(HasId::getId)
                 .collect(Collectors.toSet())
         );
     }

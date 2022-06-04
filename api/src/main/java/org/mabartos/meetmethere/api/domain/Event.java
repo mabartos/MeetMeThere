@@ -22,7 +22,7 @@ public class Event implements Serializable {
 
     private boolean isPublic;
 
-    private Set<Long> organizersId;
+    private Set<String> organizersId;
 
     private LocalDateTime createdAt;
 
@@ -36,9 +36,9 @@ public class Event implements Serializable {
 
     private String createdByName;
 
-    private Long updatedById;
+    private String updatedById;
 
-    private Long createdById;
+    private String createdById;
 
     private Address venue;
 
@@ -46,7 +46,7 @@ public class Event implements Serializable {
 
     private Map<String, String> attributes;
 
-    public Event(String title, Long createdById, String createdByFullName) {
+    public Event(String title, String createdById, String createdByFullName) {
         this.title = title;
         this.createdByName = createdByFullName;
         this.createdById = createdById;

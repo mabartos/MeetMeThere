@@ -1,5 +1,6 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
@@ -42,6 +43,7 @@ public interface EventsResource {
     Uni<Set<EventJson>> searchEventsByCoordinates(@QueryParam("longitude") Double longitude,
                                                   @QueryParam("latitude") Double latitude);
 
+    @Authenticated
     @POST
     Uni<Long> createEvent(EventJson event);
 

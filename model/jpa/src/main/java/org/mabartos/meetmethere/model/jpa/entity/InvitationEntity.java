@@ -19,11 +19,9 @@ public class InvitationEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, targetEntity = EventEntity.class)
     private EventEntity event;
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = UserEntity.class)
-    private UserEntity sender;
+    private String senderId;
 
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = UserEntity.class)
-    private UserEntity receiver;
+    private String receiverId;
 
     private String message;
 }

@@ -3,13 +3,13 @@ package org.mabartos.meetmethere.model.jpa.adapter;
 import io.smallrye.common.constraint.NotNull;
 import org.mabartos.meetmethere.api.model.AddressModel;
 import org.mabartos.meetmethere.api.model.EventModel;
+import org.mabartos.meetmethere.api.model.HasId;
 import org.mabartos.meetmethere.api.model.InvitationModel;
 import org.mabartos.meetmethere.api.model.UserModel;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.model.jpa.JpaModel;
 import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
-import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.model.jpa.util.JpaUtil;
-import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
@@ -63,12 +63,12 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
 
     @Override
     public UserModel getCreatedBy() {
-        return new JpaUserAdapter(session, em, getEntity().getCreator());
+        return session.userStorage().getUserById(getEntity().getCreatorId());
     }
 
     @Override
     public void setCreatedBy(UserModel user) {
-        getEntity().setCreator(JpaUserAdapter.convertToEntity(user, em));
+        getEntity().setCreatorId(user.getId());
     }
 
     @Override
@@ -88,20 +88,20 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
 
     @Override
     public Set<UserModel> getOrganizers() {
-        return getEntity().getOrganizers()
+        return getEntity().getOrganizersId()
                 .stream()
-                .map(u -> new JpaUserAdapter(session, em, u))
+                .map(u -> session.userStorage().getUserById(u))
                 .collect(Collectors.toSet());
     }
 
     @Override
     public void setOrganizers(Set<UserModel> organizers) {
-        Set<UserEntity> entities = organizers.stream()
+        final Set<String> organizersIds = organizers.stream()
                 .filter(Objects::nonNull)
-                .map(f -> JpaUserAdapter.convertToEntity(f, em))
+                .map(HasId::getId)
                 .collect(Collectors.toSet());
 
-        getEntity().setOrganizers(entities);
+        getEntity().setOrganizersId(organizersIds);
     }
 
     @Override
@@ -146,12 +146,12 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
 
     @Override
     public UserModel getUpdatedBy() {
-        return new JpaUserAdapter(session, em, getEntity().getUpdatedBy());
+        return session.userStorage().getUserByEmail(getEntity().getUpdatedById());
     }
 
     @Override
     public void setUpdatedBy(UserModel user) {
-        getEntity().setUpdatedBy(JpaUserAdapter.convertToEntity(user, em));
+        getEntity().setUpdatedById(user.getId());
     }
 
    /* @Override

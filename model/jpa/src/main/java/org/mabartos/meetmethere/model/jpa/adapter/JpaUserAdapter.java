@@ -2,12 +2,13 @@ package org.mabartos.meetmethere.model.jpa.adapter;
 
 import io.smallrye.common.constraint.NotNull;
 import org.mabartos.meetmethere.api.model.EventModel;
+import org.mabartos.meetmethere.api.model.HasId;
 import org.mabartos.meetmethere.api.model.UserModel;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.model.jpa.JpaModel;
 import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
 import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.model.jpa.util.JpaUtil;
-import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.persistence.EntityManager;
 import java.util.Map;
@@ -15,6 +16,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Deprecated
 public class JpaUserAdapter implements UserModel, JpaModel<UserEntity> {
     private final MeetMeThereSession session;
     private final EntityManager em;
@@ -29,13 +31,17 @@ public class JpaUserAdapter implements UserModel, JpaModel<UserEntity> {
     }
 
     @Override
-    public Long getId() {
-        return getEntity().getId();
+    public String getId() {
+        return Long.toString(getEntity().getId());
     }
 
     @Override
-    public void setId(Long id) {
-        getEntity().setId(id);
+    public void setId(String id) {
+        try {
+            getEntity().setId(Long.parseLong(id));
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("The ID must be Long");
+        }
     }
 
     @Override
@@ -83,15 +89,15 @@ public class JpaUserAdapter implements UserModel, JpaModel<UserEntity> {
         return getEntity().getOrganizedEvents()
                 .stream()
                 .filter(Objects::nonNull)
-                .map(f -> new JpaEventAdapter(session, em, f))
+                .map(f -> session.eventStorage().getEventById(f))
                 .collect(Collectors.toSet());
     }
 
     @Override
     public void setOrganizedEvents(Set<EventModel> events) {
-        final Set<EventEntity> entities = events.stream()
+        final Set<Long> entities = events.stream()
                 .filter(Objects::nonNull)
-                .map(f -> JpaEventAdapter.convertToEntity(f, em))
+                .map(HasId::getId)
                 .collect(Collectors.toSet());
 
         getEntity().setOrganizedEvents(entities);

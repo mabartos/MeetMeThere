@@ -5,14 +5,12 @@ import org.mabartos.meetmethere.api.model.InvitationModel;
 import org.mabartos.meetmethere.api.model.UserModel;
 import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.model.exception.ModelNotFoundException;
-import org.mabartos.meetmethere.model.jpa.adapter.JpaEventAdapter;
-import org.mabartos.meetmethere.model.jpa.adapter.JpaInvitationAdapter;
-import org.mabartos.meetmethere.model.jpa.adapter.JpaUserAdapter;
-import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
-import org.mabartos.meetmethere.model.jpa.entity.InvitationEntity;
-import org.mabartos.meetmethere.model.jpa.entity.UserEntity;
 import org.mabartos.meetmethere.api.provider.InvitationProvider;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaEventAdapter;
+import org.mabartos.meetmethere.model.jpa.adapter.JpaInvitationAdapter;
+import org.mabartos.meetmethere.model.jpa.entity.EventEntity;
+import org.mabartos.meetmethere.model.jpa.entity.InvitationEntity;
 
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
@@ -58,10 +56,13 @@ public class JpaEventInvitationProvider implements InvitationProvider {
             throw new ModelDuplicateException("Duplicate Event invitation");
         }
 
+        if (invitation.getSender() == null) throw new IllegalArgumentException("You need to specify sender");
+        if (invitation.getReceiver() == null) throw new IllegalArgumentException("You need to specify receiver");
+
         InvitationEntity entity = new InvitationEntity();
         entity.setEvent(JpaEventAdapter.convertToEntity(invitation.getEvent(), em));
-        entity.setSender(JpaUserAdapter.convertToEntity(invitation.getSender(), em));
-        entity.setReceiver(JpaUserAdapter.convertToEntity(invitation.getReceiver(), em));
+        entity.setSenderId(invitation.getSender().getId());
+        entity.setReceiverId(invitation.getReceiver().getId());
 
         convertInvitationStaticAttributes(entity, invitation);
 
@@ -73,11 +74,14 @@ public class JpaEventInvitationProvider implements InvitationProvider {
 
     @Override
     public InvitationModel createInvitation(EventModel event, UserModel sender, UserModel receiver, String message) {
+        if (sender == null) throw new IllegalArgumentException("You need to specify sender");
+        if (receiver == null) throw new IllegalArgumentException("You need to specify receiver");
+
         InvitationEntity entity = new InvitationEntity();
 
         entity.setEvent(JpaEventAdapter.convertToEntity(event, em));
-        entity.setSender(JpaUserAdapter.convertToEntity(sender, em));
-        entity.setReceiver(JpaUserAdapter.convertToEntity(receiver, em));
+        entity.setSenderId(sender.getId());
+        entity.setReceiverId(receiver.getId());
 
         if (message != null) {
             entity.setMessage(message);
@@ -95,10 +99,13 @@ public class JpaEventInvitationProvider implements InvitationProvider {
 
     @Override
     public void createInvitations(EventModel event, UserModel sender, Set<UserModel> receivers, String message) {
-        EventEntity eventEntity = JpaEventAdapter.convertToEntity(event, em);
-        UserEntity senderEntity = JpaUserAdapter.convertToEntity(sender, em);
+        if (sender == null) throw new IllegalArgumentException("You need to specify sender");
+        if (receivers == null || receivers.isEmpty())
+            throw new IllegalArgumentException("You need to specify receiver");
 
-        if (eventEntity == null || senderEntity == null) {
+        EventEntity eventEntity = JpaEventAdapter.convertToEntity(event, em);
+
+        if (eventEntity == null) {
             throw new IllegalArgumentException("Cannot create invitations");
         }
 
@@ -106,8 +113,8 @@ public class JpaEventInvitationProvider implements InvitationProvider {
             InvitationEntity entity = new InvitationEntity();
 
             entity.setEvent(eventEntity);
-            entity.setSender(senderEntity);
-            entity.setReceiver(JpaUserAdapter.convertToEntity(receiver, em));
+            entity.setSenderId(sender.getId());
+            entity.setReceiverId(receiver.getId());
 
             em.persist(entity);
         }
@@ -134,8 +141,8 @@ public class JpaEventInvitationProvider implements InvitationProvider {
 
     public void convertInvitation(InvitationEntity entity, InvitationModel model) {
         update(entity::setEvent, () -> JpaEventAdapter.convertToEntity(model.getEvent(), em));
-        update(entity::setSender, () -> JpaUserAdapter.convertToEntity(model.getSender(), em));
-        update(entity::setReceiver, () -> JpaUserAdapter.convertToEntity(model.getReceiver(), em));
+        update(entity::setSenderId, () -> model.getSender().getId());
+        update(entity::setReceiverId, () -> model.getReceiver().getId());
         convertInvitationStaticAttributes(entity, model);
     }
 

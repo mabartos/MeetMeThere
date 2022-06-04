@@ -7,10 +7,12 @@ import io.vertx.mutiny.core.eventbus.EventBus;
 import org.mabartos.meetmethere.api.provider.EventProvider;
 import org.mabartos.meetmethere.api.provider.InvitationProvider;
 import org.mabartos.meetmethere.api.provider.UserProvider;
+import org.mabartos.meetmethere.api.service.AuthService;
 import org.mabartos.meetmethere.api.service.EventInvitationService;
 import org.mabartos.meetmethere.api.service.EventService;
 import org.mabartos.meetmethere.api.service.UserService;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
+import org.mabartos.meetmethere.service.core.factory.AuthServiceFactory;
 import org.mabartos.meetmethere.service.core.factory.EventServiceFactory;
 import org.mabartos.meetmethere.service.core.factory.InvitationServiceFactory;
 import org.mabartos.meetmethere.service.core.factory.UserServiceFactory;
@@ -33,6 +35,12 @@ public class DefaultMeetMeThereSession implements MeetMeThereSession {
     @Inject
     EventBus eventBus;
 
+    @Override
+    public AuthService auth() {
+        return new AuthServiceFactory().create(this);
+    }
+
+    @Deprecated
     @Override
     public UserService users() {
         return new UserServiceFactory().create(this);

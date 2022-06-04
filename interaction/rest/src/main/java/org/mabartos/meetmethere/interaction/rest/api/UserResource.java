@@ -1,5 +1,6 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
@@ -17,14 +18,17 @@ import javax.ws.rs.core.Response;
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
 @Tag(name = "User Resource API", description = "Provide API for a particular user.")
+@Authenticated
 public interface UserResource {
 
     @GET
     Uni<UserJson> getUser();
 
+    @Deprecated
     @DELETE
     Response removeUser();
 
+    @Deprecated
     @PATCH
     Uni<UserJson> updateUser(UserJson user);
 }

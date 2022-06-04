@@ -4,10 +4,10 @@ import io.smallrye.common.constraint.NotNull;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.InvitationModel;
 import org.mabartos.meetmethere.api.model.UserModel;
+import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import org.mabartos.meetmethere.model.jpa.JpaModel;
 import org.mabartos.meetmethere.model.jpa.entity.InvitationEntity;
 import org.mabartos.meetmethere.model.jpa.util.JpaUtil;
-import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
 import javax.persistence.EntityManager;
 import java.util.Objects;
@@ -47,22 +47,22 @@ public class JpaInvitationAdapter implements InvitationModel, JpaModel<Invitatio
 
     @Override
     public UserModel getSender() {
-        return new JpaUserAdapter(session, em, getEntity().getSender());
+        return session.userStorage().getUserById(getEntity().getSenderId());
     }
 
     @Override
     public void setSender(UserModel sender) {
-        getEntity().setSender(JpaUserAdapter.convertToEntity(sender, em));
+        getEntity().setSenderId(sender.getId());
     }
 
     @Override
     public UserModel getReceiver() {
-        return new JpaUserAdapter(session, em, getEntity().getReceiver());
+        return session.userStorage().getUserById(getEntity().getSenderId());
     }
 
     @Override
     public void setReceiver(UserModel receiver) {
-        getEntity().setReceiver(JpaUserAdapter.convertToEntity(receiver, em));
+        getEntity().setReceiverId(receiver.getId());
     }
 
     @Override

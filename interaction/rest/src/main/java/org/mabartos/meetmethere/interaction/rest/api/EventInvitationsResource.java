@@ -1,5 +1,6 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventInvitationJson;
@@ -25,6 +26,7 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Produces(MediaType.APPLICATION_JSON)
 @Transactional
 @Tag(name = "Event Invitations Resource API", description = "Provide API for all invitations to event.")
+@Authenticated
 public interface EventInvitationsResource {
 
     @GET

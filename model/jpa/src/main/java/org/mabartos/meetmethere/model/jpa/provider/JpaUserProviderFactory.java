@@ -4,6 +4,7 @@ import org.mabartos.meetmethere.api.provider.ProviderFactory;
 import org.mabartos.meetmethere.api.provider.UserProvider;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
+@Deprecated
 public class JpaUserProviderFactory implements ProviderFactory<UserProvider> {
 
     @Override

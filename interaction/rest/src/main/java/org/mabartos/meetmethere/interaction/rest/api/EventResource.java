@@ -1,5 +1,6 @@
 package org.mabartos.meetmethere.interaction.rest.api;
 
+import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.mabartos.meetmethere.interaction.rest.api.model.EventJson;
@@ -23,9 +24,11 @@ public interface EventResource {
     @GET
     Uni<EventJson> getEvent();
 
+    @Authenticated
     @DELETE
     Response removeEvent();
 
+    @Authenticated
     @PATCH
     Uni<EventJson> updateEvent(EventJson event);
 
