@@ -14,6 +14,7 @@ import org.mabartos.meetmethere.interaction.rest.api.model.mapper.UserJsonDomain
 import org.mabartos.meetmethere.service.rest.util.EventBusUtil;
 import org.mapstruct.factory.Mappers;
 
+import javax.annotation.security.PermitAll;
 import javax.enterprise.context.RequestScoped;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
@@ -40,7 +41,6 @@ import static org.mabartos.meetmethere.interaction.rest.api.ResourceConstants.MA
 @Produces(MediaType.APPLICATION_JSON)
 @RequestScoped
 @Transactional
-@Authenticated
 public class UsersResourceProvider implements UsersResource {
     private static final UserJsonDomainMapper mapper = Mappers.getMapper(UserJsonDomainMapper.class);
     static final String CACHE_NAME = "users-resource-provider-cache";

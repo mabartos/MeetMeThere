@@ -17,7 +17,7 @@ public class DefaultEventPermissionEvaluator implements EventPermissionEvaluator
 
     @Override
     public boolean canView() {
-        return session.auth().isAuthenticated();
+        return true;
     }
 
     @Override

@@ -9,32 +9,38 @@ import org.mabartos.meetmethere.api.model.exception.ModelDuplicateException;
 import org.mabartos.meetmethere.api.provider.UserProvider;
 import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 
+import javax.inject.Inject;
 import javax.transaction.Transactional;
 import java.util.Set;
+import java.util.logging.Logger;
 
+// TODO Properties injection doesn't work ATM
 @Transactional
 public class KeycloakUserProvider implements UserProvider {
+    private static final Logger log = Logger.getLogger(KeycloakUserProvider.class.getName());
+
     private final MeetMeThereSession session;
     private final Keycloak keycloak;
     private final UsersResource usersResource;
 
-    @ConfigProperty(name = "keycloak.serverUrl")
-    String SERVER_URL;
+    //@ConfigProperty(name = "keycloak.serverUrl", defaultValue = "http://0.0.0.0:8080/auth")
+    private final String SERVER_URL = "http://0.0.0.0:8080/auth";
 
-    @ConfigProperty(name = "keycloak.realm")
-    String REALM;
+    //@ConfigProperty(name = "keycloak.realm", defaultValue = "master")
+    private final String REALM = "master";
 
-    @ConfigProperty(name = "keycloak.admin.username")
-    String ADMIN_USERNAME;
+    //@ConfigProperty(name = "keycloak.admin.username", defaultValue = "admin")
+    private final String ADMIN_USERNAME = "admin";
 
-    @ConfigProperty(name = "keycloak.admin.password")
-    String ADMIN_PASSWORD;
+    //@ConfigProperty(name = "keycloak.admin.password", defaultValue = "admin")
+    private final String ADMIN_PASSWORD = "admin";
 
-    @ConfigProperty(name = "keycloak.client")
-    String CLIENT;
+    //@ConfigProperty(name = "keycloak.client", defaultValue = "meet-me-there-backend")
+    private final String CLIENT = "meet-me-there-backend";
 
     public KeycloakUserProvider(MeetMeThereSession session) {
         this.session = session;
+        log.info(String.format("Keycloak settings: SERVER_URL='%s', REALM='%s', CLIENT='%s'", SERVER_URL, REALM, CLIENT));
         this.keycloak = Keycloak.getInstance(SERVER_URL, REALM, ADMIN_USERNAME, ADMIN_PASSWORD, CLIENT);
         this.usersResource = keycloak.realm(REALM).users();
     }

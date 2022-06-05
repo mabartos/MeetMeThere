@@ -5,6 +5,7 @@ import io.smallrye.mutiny.Uni;
 import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 import org.mabartos.meetmethere.interaction.rest.api.model.UserJson;
 
+import javax.annotation.security.PermitAll;
 import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -49,5 +50,6 @@ public interface UsersResource {
 
     @Deprecated
     @POST
+    @PermitAll
     Uni<Long> createUser(UserJson user);
 }
