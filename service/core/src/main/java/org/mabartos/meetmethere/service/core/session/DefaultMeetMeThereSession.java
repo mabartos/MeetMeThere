@@ -22,19 +22,43 @@ import org.mabartos.meetmethere.service.core.store.InvitationStoreFactory;
 import org.mabartos.meetmethere.service.core.store.UserStoreFactory;
 
 import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 @RequestScoped
 @Transactional
 public class DefaultMeetMeThereSession implements MeetMeThereSession {
+    private final ConcurrentMap<Class<?>, Object> providers = new ConcurrentHashMap<>();
+
+    @Inject
+    BeanManager beanManager;
 
     @Inject
     EntityManager em;
 
     @Inject
     EventBus eventBus;
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T> T getProvider(Class<T> clazz) {
+        return (T) providers.computeIfAbsent(clazz, item -> {
+            final Set<Bean<?>> beans = beanManager.getBeans(clazz);
+            if (beans.iterator().hasNext()) {
+                final Bean<?> bean = beans.iterator().next();
+                final CreationalContext<?> context = beanManager.createCreationalContext(bean);
+                return beanManager.getReference(bean, clazz, context);
+            }
+            return null;
+        });
+    }
 
     @Override
     public AppContext context() {
