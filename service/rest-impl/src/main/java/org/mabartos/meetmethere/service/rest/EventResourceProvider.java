@@ -25,6 +25,7 @@ import javax.ws.rs.core.Response;
 import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_GET_EVENT_EVENT;
 import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_REMOVE_EVENT;
 import static org.mabartos.meetmethere.api.model.eventbus.event.EventEventsNames.EVENT_UPDATE_EVENT;
+import static org.mabartos.meetmethere.service.rest.EventsResourceProvider.CACHE_NAME;
 import static org.mabartos.meetmethere.service.rest.EventsResourceProvider.getSingleEvent;
 
 @Consumes(MediaType.APPLICATION_JSON)
@@ -42,10 +43,8 @@ public class EventResourceProvider implements EventResource {
     }
 
     @GET
-    @CacheResult(cacheName = EventsResourceProvider.CACHE_NAME)
+    @CacheResult(cacheName = CACHE_NAME)
     public Uni<EventJson> getEvent() {
-        session.auth().events().requireViewId(eventId);
-
         return getSingleEvent(session.eventBus(), EVENT_GET_EVENT_EVENT, eventId);
     }
 
@@ -80,12 +79,12 @@ public class EventResourceProvider implements EventResource {
         return new EventInvitationsResourceProvider(session, eventId);
     }
 
-    @CacheInvalidate(cacheName = EventsResourceProvider.CACHE_NAME)
+    @CacheInvalidate(cacheName = CACHE_NAME)
     void invalidateById(Long id) {
 
     }
 
-    @CacheInvalidate(cacheName = EventsResourceProvider.CACHE_NAME)
+    @CacheInvalidate(cacheName = CACHE_NAME)
     void invalidateByTitle(String title) {
 
     }

@@ -2,6 +2,7 @@ package org.mabartos.meetmethere.model.caffeine.provider;
 
 import io.quarkus.cache.Cache;
 import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheInvalidateAll;
 import io.quarkus.cache.CacheName;
 import io.quarkus.cache.CacheResult;
 import org.mabartos.meetmethere.api.model.AddressModel;
@@ -38,8 +39,9 @@ public class CaffeineEventProvider implements EventProvider {
     }
 
     @Override
+    @CacheResult(cacheName = CACHE_NAME)
     public EventModel getEventById(Long id) {
-        return searchCache(id, v -> secondLevelStore.getEventById(id));
+        return secondLevelStore.getEventById(id);
     }
 
     @CacheInvalidate(cacheName = CACHE_NAME)
@@ -54,14 +56,20 @@ public class CaffeineEventProvider implements EventProvider {
     public void invalidateByCoordinates(Coordinates coordinates) {
     }
 
-    @Override
-    public Set<EventModel> searchByTitle(String title) {
-        return searchCache(title, v -> secondLevelStore.searchByTitle(title));
+    @CacheInvalidateAll(cacheName = CACHE_NAME)
+    public void invalidateAll() {
     }
 
     @Override
+    @CacheResult(cacheName = CACHE_NAME)
+    public Set<EventModel> searchByTitle(String title) {
+        return secondLevelStore.searchByTitle(title);
+    }
+
+    @Override
+    @CacheResult(cacheName = CACHE_NAME)
     public Set<EventModel> searchByCoordinates(Coordinates coordinates) {
-        return searchCache(coordinates, v -> secondLevelStore.searchByCoordinates(coordinates));
+        return secondLevelStore.searchByCoordinates(coordinates);
     }
 
     @Override
@@ -90,17 +98,29 @@ public class CaffeineEventProvider implements EventProvider {
 
     @Override
     public EventModel createEvent(EventModel event) throws ModelDuplicateException {
-        return secondLevelStore.createEvent(event);
+        final EventModel result = secondLevelStore.createEvent(event);
+        invalidateById(result.getId());
+        invalidateByTitle(event.getEventTitle());
+        invalidateAll();
+        return result;
     }
 
     @Override
     public EventModel createEvent(String title, UserModel creator) {
-        return secondLevelStore.createEvent(title, creator);
+        final EventModel result = secondLevelStore.createEvent(title, creator);
+        invalidateById(result.getId());
+        invalidateByTitle(title);
+        invalidateAll();
+        return result;
     }
 
     @Override
     public EventModel createEvent(String title, String creatorName) {
-        return secondLevelStore.createEvent(title, creatorName);
+        final EventModel result = secondLevelStore.createEvent(title, creatorName);
+        invalidateById(result.getId());
+        invalidateByTitle(title);
+        invalidateAll();
+        return result;
     }
 
     @Override

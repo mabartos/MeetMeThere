@@ -1,7 +1,8 @@
 package org.mabartos.meetmethere.service.rest;
 
+import io.quarkus.cache.CacheInvalidate;
+import io.quarkus.cache.CacheInvalidateAll;
 import io.quarkus.cache.CacheResult;
-import io.quarkus.security.Authenticated;
 import io.smallrye.mutiny.Uni;
 import io.vertx.mutiny.core.eventbus.EventBus;
 import io.vertx.mutiny.core.eventbus.Message;
@@ -63,10 +64,7 @@ public class EventsResourceProvider implements EventsResource {
     }
 
     @Path("/{id}")
-    @CacheResult(cacheName = CACHE_NAME)
     public EventResource getEventById(@PathParam(ID) Long id) {
-        session.auth().events().requireViewId(id);
-
         return new EventResourceProvider(session, id);
     }
 
@@ -91,6 +89,8 @@ public class EventsResourceProvider implements EventsResource {
 
     @POST
     public Uni<Long> createEvent(EventJson event) {
+        invalidateByTitle(event.getTitle());
+        invalidateAll();
         return EventBusUtil.createEntity(session.eventBus(), EVENT_CREATE_EVENT, mapper.toDomain(event));
     }
 
@@ -107,5 +107,17 @@ public class EventsResourceProvider implements EventsResource {
 
     protected static Uni<Set<EventJson>> getSetOfEvents(EventBus bus, String address, Object object) {
         return EventBusUtil.getSetOfEntities(bus, address, object, mapper::toJson);
+    }
+
+    @CacheInvalidate(cacheName = CACHE_NAME)
+    public void invalidateById(Long id) {
+    }
+
+    @CacheInvalidate(cacheName = CACHE_NAME)
+    public void invalidateByTitle(String title) {
+    }
+
+    @CacheInvalidateAll(cacheName = CACHE_NAME)
+    public void invalidateAll() {
     }
 }
