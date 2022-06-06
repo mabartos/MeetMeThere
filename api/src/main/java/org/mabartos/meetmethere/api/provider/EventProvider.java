@@ -1,5 +1,6 @@
 package org.mabartos.meetmethere.api.provider;
 
+import org.mabartos.meetmethere.api.model.AddressModel;
 import org.mabartos.meetmethere.api.model.Coordinates;
 import org.mabartos.meetmethere.api.model.EventModel;
 import org.mabartos.meetmethere.api.model.UserModel;
@@ -26,6 +27,8 @@ public interface EventProvider {
     EventModel createEvent(EventModel event) throws ModelDuplicateException;
 
     EventModel createEvent(String title, UserModel creator);
+
+    EventModel createEvent(String title, String creatorName);
 
     void removeEvent(Long id);
 

@@ -90,10 +90,7 @@ public class EventsResourceProvider implements EventsResource {
     }
 
     @POST
-    @Authenticated
     public Uni<Long> createEvent(EventJson event) {
-        session.auth().events().requireManage(event);
-
         return EventBusUtil.createEntity(session.eventBus(), EVENT_CREATE_EVENT, mapper.toDomain(event));
     }
 

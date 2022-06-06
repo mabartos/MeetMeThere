@@ -53,8 +53,12 @@ public class EventEntity extends BaseEntity {
 
     private String creatorId;
 
+    private String creatorName;
+
     @Embedded
     private AddressEntity venue;
+
+    private String venueName;
 
     @OneToMany(cascade = CascadeType.REMOVE, orphanRemoval = true, mappedBy = "event")
     @BatchSize(size = 20)

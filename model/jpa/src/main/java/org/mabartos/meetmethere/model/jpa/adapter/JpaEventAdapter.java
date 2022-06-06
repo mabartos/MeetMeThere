@@ -72,6 +72,16 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
     }
 
     @Override
+    public String getCreatorName() {
+        return getEntity().getCreatorName();
+    }
+
+    @Override
+    public void setCreatorName(String creatorName) {
+        getEntity().setCreatorName(creatorName);
+    }
+
+    @Override
     public LocalDateTime getCreatedAt() {
         return getEntity().getCreatedAt();
     }
@@ -132,6 +142,16 @@ public class JpaEventAdapter implements EventModel, JpaModel<EventEntity> {
     @Override
     public void setVenue(AddressModel venue) {
         getEntity().setVenue(JpaAddressAdapter.convertToEntity(venue));
+    }
+
+    @Override
+    public String getVenueName() {
+        return getEntity().getVenueName();
+    }
+
+    @Override
+    public void setVenueName(String venueName) {
+        getEntity().setVenueName(venueName);
     }
 
     @Override

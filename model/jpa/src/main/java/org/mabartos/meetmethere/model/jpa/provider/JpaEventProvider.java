@@ -95,7 +95,6 @@ public class JpaEventProvider implements EventProvider {
 
     @Override
     public Set<EventModel> getEventsByOrganizator(String userId) {
-        //TODO need to check
         final Optional<List<EventEntity>> events = JpaUtil.catchNoResult(() ->
                 em.createQuery("select e from EventEntity e where :userId in (e.organizersId)", EventEntity.class)
                         .setParameter("userId", userId)
@@ -138,6 +137,18 @@ public class JpaEventProvider implements EventProvider {
     }
 
     @Override
+    public EventModel createEvent(String title, String creatorName) {
+        EventEntity entity = new EventEntity();
+        entity.setTitle(title);
+        entity.setCreatorName(creatorName);
+
+        em.persist(entity);
+        em.flush();
+
+        return new JpaEventAdapter(session, em, entity);
+    }
+
+    @Override
     public void removeEvent(Long id) {
         if (!EventEntity.deleteById(id)) throw new ModelNotFoundException("Cannot find a particular event");
     }
@@ -169,6 +180,7 @@ public class JpaEventProvider implements EventProvider {
         update(entity::setEndTime, model::getEndTime);
         update(entity::setAttributes, model::getAttributes);
 
+        update(entity::setCreatorName, model::getCreatorName);
         update(entity::setCreatorId, () -> model.getCreatedBy().getId());
         update(entity::setUpdatedById, () -> model.getUpdatedBy().getId());
         update(entity::setVenue, () -> JpaAddressAdapter.convertToEntity(model.getVenue()));

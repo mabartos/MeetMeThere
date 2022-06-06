@@ -9,6 +9,10 @@ public interface EventModel extends HasId<Long>, HasAttributes<String, String> {
 
     void setCreatedBy(UserModel user);
 
+    String getCreatorName();
+
+    void setCreatorName(String creatorName);
+
     LocalDateTime getCreatedAt();
 
     boolean isPublic();
@@ -38,6 +42,10 @@ public interface EventModel extends HasId<Long>, HasAttributes<String, String> {
     AddressModel getVenue();
 
     void setVenue(AddressModel venue);
+
+    String getVenueName();
+
+    void setVenueName(String venueName);
 
     LocalDateTime getUpdatedAt();
 

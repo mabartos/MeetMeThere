@@ -30,11 +30,16 @@ public class ModelToDomain {
 
     public static Event toDomain(EventModel model) {
         if (model == null) return null;
+        Event event;
 
-        Event event = new Event(model.getEventTitle(),
-                model.getCreatedBy().getId(),
-                String.format("%s %s", model.getCreatedBy().getFirstName(), model.getCreatedBy().getLastName())
-        );
+        if (model.getCreatedBy() != null) {
+            event = new Event(model.getEventTitle(),
+                    String.format("%s %s", model.getCreatedBy().getFirstName(), model.getCreatedBy().getLastName()),
+                    model.getCreatedBy().getId()
+            );
+        } else {
+            event = new Event(model.getEventTitle(), null, model.getCreatorName());
+        }
 
         update(event::setId, model::getId);
         update(event::setDescription, model::getDescription);
@@ -43,9 +48,12 @@ public class ModelToDomain {
 
         update(event::setUpdatedAt, model::getUpdatedAt);
         update(event::setCreatedAt, model::getCreatedAt);
+
         final UserModel updatedBy = model.getUpdatedBy();
-        update(event::setUpdatedById, updatedBy::getId);
-        update(event::setUpdatedByName, () -> String.format("%s %s", updatedBy.getFirstName(), updatedBy.getLastName()));
+        if (updatedBy != null) {
+            update(event::setUpdatedById, updatedBy::getId);
+            update(event::setUpdatedByName, () -> String.format("%s %s", updatedBy.getFirstName(), updatedBy.getLastName()));
+        }
 
         update(event::setStartTime, model::getStartTime);
         update(event::setEndTime, model::getEndTime);

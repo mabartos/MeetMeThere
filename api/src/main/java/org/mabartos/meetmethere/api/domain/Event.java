@@ -42,6 +42,8 @@ public class Event implements Serializable {
 
     private Address venue;
 
+    private String venueName;
+
     private Set<Long> invitationsId;
 
     private Map<String, String> attributes;

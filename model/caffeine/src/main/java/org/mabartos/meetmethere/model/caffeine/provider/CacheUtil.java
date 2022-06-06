@@ -7,6 +7,7 @@ import java.util.function.Function;
 public class CacheUtil {
 
     public static <T, U> T searchCache(Cache cache, U key, Function<U, T> function) {
+        if (cache == null) return null;
         return cache.get(key, function).await().indefinitely();
     }
 }

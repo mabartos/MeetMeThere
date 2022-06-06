@@ -15,9 +15,12 @@ import org.mabartos.meetmethere.api.session.MeetMeThereSession;
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.transaction.Transactional;
+import javax.ws.rs.BadRequestException;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.Optional.of;
 
 @ApplicationScoped
 @Transactional
@@ -36,14 +39,23 @@ public class DefaultEventService implements EventService {
             throw new ModelDuplicateException("Event already exists with the id.");
         }
 
-        final UserModel creator = session.userStorage().getUserById(event.getCreatedById());
-        if (creator == null) throw new ModelNotFoundException("Cannot find creator");
+        Optional<EventModel> eventModel = Optional.empty();
 
-        EventModel model = session.eventStorage().createEvent(event.getTitle(), creator);
-        ModelUpdater.updateModel(event, model);
+        if (event.getCreatedById() != null) {
+            final UserModel creator = session.userStorage().getUserById(event.getCreatedById());
+            if (creator == null) throw new ModelNotFoundException("Cannot find creator");
+            eventModel = of(session.eventStorage().createEvent(event.getTitle(), creator));
+        } else if (event.getCreatedByName() != null) {
+            eventModel = of(session.eventStorage().createEvent(event.getTitle(), event.getCreatedByName()));
+        }
 
-        return Uni.createFrom().item(session.eventStorage().updateEvent(model).getId());
+        if (eventModel.isEmpty()) {
+            throw new BadRequestException("Unknown creator!");
+        }
 
+        ModelUpdater.updateModel(event, eventModel.get());
+
+        return Uni.createFrom().item(session.eventStorage().updateEvent(eventModel.get()).getId());
     }
 
     @Override

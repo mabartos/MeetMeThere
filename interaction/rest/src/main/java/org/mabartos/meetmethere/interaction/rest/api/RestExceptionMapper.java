@@ -22,39 +22,39 @@ public class RestExceptionMapper implements ExceptionMapper<Throwable> {
     }
 
     private static int getStatusCode(Throwable throwable) {
-        final int status = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
+        int status = Response.Status.INTERNAL_SERVER_ERROR.getStatusCode();
 
         if (throwable instanceof CacheException) {
             throwable = throwable.getCause();
         }
 
         if (throwable instanceof SecurityException) {
-            return Response.Status.FORBIDDEN.getStatusCode();
+            status = Response.Status.FORBIDDEN.getStatusCode();
         }
 
         if (throwable instanceof WebApplicationException) {
             WebApplicationException ex = (WebApplicationException) throwable;
-            return ex.getResponse().getStatus();
+            status = ex.getResponse().getStatus();
         }
 
         if (throwable instanceof Failure) {
             Failure f = (Failure) throwable;
-            return f.getErrorCode();
+            status = f.getErrorCode();
         }
 
         if (throwable instanceof JsonParseException || throwable instanceof UnsupportedOperationException) {
-            return Response.Status.BAD_REQUEST.getStatusCode();
+            status = Response.Status.BAD_REQUEST.getStatusCode();
         }
 
         if (throwable instanceof ModelNotFoundException) {
-            return Response.Status.NOT_FOUND.getStatusCode();
+            status = Response.Status.NOT_FOUND.getStatusCode();
         }
 
         if (throwable instanceof ModelDuplicateException) {
-            return Response.Status.CONFLICT.getStatusCode();
+            status = Response.Status.CONFLICT.getStatusCode();
         }
 
-        if (status == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode()) {
+        if (status == Response.Status.INTERNAL_SERVER_ERROR.getStatusCode() || status == Response.Status.BAD_REQUEST.getStatusCode()) {
             throwable.printStackTrace();
         }
 

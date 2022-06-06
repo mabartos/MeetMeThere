@@ -25,6 +25,7 @@ public class ModelUpdater {
         update(model::setStartTime, event::getStartTime);
         update(model::setEndTime, event::getEndTime);
         update(model::setAttributes, event::getAttributes);
+        update(model::setVenueName, event::getVenueName);
 
         if (model.getVenue() != null && event.getVenue() != null) {
             updateModel(event.getVenue(), model.getVenue());
@@ -36,6 +37,7 @@ public class ModelUpdater {
     }
 
     public static void updateModel(Address address, AddressModel model) {
+        if (model == null || address == null) return;
         update(model::setCountry, address::getCountry);
         update(model::setZipCode, address::getZipCode);
         update(model::setCity, address::getCity);

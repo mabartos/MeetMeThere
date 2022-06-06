@@ -66,11 +66,13 @@ public class JpaAddressAdapter implements AddressModel {
 
     @Override
     public Coordinates getCoordinates() {
+        if (entity == null) return null;
         return new Coordinates(entity.getLongitude(), entity.getLatitude());
     }
 
     @Override
     public void setCoordinates(Coordinates coordinates) {
+        if (entity == null) return;
         entity.setLongitude(coordinates.getLongitude());
         entity.setLatitude(coordinates.getLatitude());
     }

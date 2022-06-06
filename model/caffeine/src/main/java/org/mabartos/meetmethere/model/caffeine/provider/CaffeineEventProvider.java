@@ -99,6 +99,11 @@ public class CaffeineEventProvider implements EventProvider {
     }
 
     @Override
+    public EventModel createEvent(String title, String creatorName) {
+        return secondLevelStore.createEvent(title, creatorName);
+    }
+
+    @Override
     public void removeEvent(Long id) {
         invalidateById(id);
         secondLevelStore.removeEvent(id);
